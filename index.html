@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的个人主页</title>
+    <style>
+        /* 1. 全局背景：复刻那种格子纹理 */
+        body {
+            background-color: #f0f4f0;
+            background-image: radial-gradient(#d1e0d1 1px, transparent 1px);
+            background-size: 20px 20px; /* 格子大小 */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* 2. 关于我 - 顶部大卡片 */
+        .about-card {
+            background: white;
+            border: 2px solid #a8c6a8;
+            padding: 20px;
+            max-width: 350px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        .about-card h2 { margin-top: 0; font-size: 1.2rem; letter-spacing: 2px; }
+        .highlight { background: #d4e9d4; }
+
+        /* 3. 音乐/图片卡片容器 */
+        .card-container {
+            width: 100%;
+            max-width: 380px;
+        }
+
+        /* 4. 单个小卡片样式 */
+        .card {
+            display: flex;
+            align-items: center;
+            background: #334455; /* 默认深色 */
+            color: white;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            overflow: hidden;
+            box-shadow: 4px 4px 0px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+        .card:hover { transform: scale(1.02); }
+
+        .card img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+        }
+
+        .card-info {
+            padding: 10px 15px;
+            flex-grow: 1;
+        }
+
+        /* 不同颜色的卡片 */
+        .bg-red { background: #b01a1a; }
+        .bg-purple { background: #8e24aa; }
+        .bg-blue { background: #1e88e5; }
+    </style>
+</head>
+<body>
+
+    <div class="about-card">
+        <h2>ABOUT</h2>
+        <p>喜欢收集可爱的东西，比如 <span class="highlight">sony angels</span> 和各种盲盒。✨</p>
+        <p class="highlight">before you interact</p>
+        <p>这里分享我的游戏日常和收藏品。</p>
+    </div>
+
+    <div class="card-container">
+        
+        <div class="card bg-red" style="margin-left: 20px;">
+            <img src="https://via.placeholder.com/80" alt="cover">
+            <div class="card-info">
+                <strong>照片编号 #001</strong><br>
+                <small>描述文字放在这里</small>
+            </div>
+        </div>
+
+        <div class="card bg-purple">
+            <img src="https://via.placeholder.com/80" alt="cover">
+            <div class="card-info">
+                <strong>照片编号 #002</strong><br>
+                <small>Sidechain Fever - LJ</small>
+            </div>
+        </div>
+
+        <div class="card bg-blue" style="margin-left: 10px;">
+            <img src="https://via.placeholder.com/80" alt="cover">
+            <div class="card-info">
+                <strong>照片编号 #003</strong><br>
+                <small>Dance Dance - Lexie Liu</small>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>
