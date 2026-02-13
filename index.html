@@ -3,102 +3,136 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>我的个人主页</title>
+    <title>Tokki的个人主页</title>
     <style>
-        /* 1. 全局背景：复刻那种格子纹理 */
+        /* 复刻你发的那张卡片背景色和格子纹理 */
         body {
             background-color: #f0f4f0;
             background-image: radial-gradient(#d1e0d1 1px, transparent 1px);
-            background-size: 20px 20px; /* 格子大小 */
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            background-size: 20px 20px;
+            font-family: 'Segoe UI', "PingFang SC", sans-serif;
+            margin: 0; padding: 20px;
+            display: flex; flex-direction: column; align-items: center;
         }
 
-        /* 2. 关于我 - 顶部大卡片 */
+        /* 顶部关于我卡片 */
         .about-card {
             background: white;
-            border: 2px solid #a8c6a8;
+            border: 2px solid #333;
             padding: 20px;
             max-width: 350px;
-            margin-bottom: 20px;
-            position: relative;
+            margin-bottom: 25px;
+            box-shadow: 6px 6px 0px #333;
+            border-radius: 4px;
         }
-        .about-card h2 { margin-top: 0; font-size: 1.2rem; letter-spacing: 2px; }
-        .highlight { background: #d4e9d4; }
+        .about-card h2 { margin-top: 0; font-size: 1.2rem; border-bottom: 2px solid #f0f4f0; padding-bottom: 5px; }
+        .highlight { background: #333; color: white; padding: 0 5px; }
 
-        /* 3. 音乐/图片卡片容器 */
-        .card-container {
-            width: 100%;
-            max-width: 380px;
-        }
+        /* 卡片容器 */
+        .container { width: 100%; max-width: 400px; }
 
-        /* 4. 单个小卡片样式 */
-        .card {
+        /* 单个照片卡片样式 */
+        .photo-card {
             display: flex;
             align-items: center;
-            background: #334455; /* 默认深色 */
+            background: #222; /* 黑猫深色背景 */
             color: white;
             border-radius: 12px;
             margin-bottom: 15px;
             overflow: hidden;
-            box-shadow: 4px 4px 0px rgba(0,0,0,0.1);
-            transition: transform 0.2s;
+            box-shadow: 4px 4px 10px rgba(0,0,0,0.1);
+            transition: 0.3s;
         }
-        .card:hover { transform: scale(1.02); }
+        .photo-card:hover { transform: translateY(-3px); }
 
-        .card img {
-            width: 80px;
-            height: 80px;
+        /* 照片显示 */
+        .photo-card img {
+            width: 90px; height: 90px;
             object-fit: cover;
+            border-right: 2px solid #444;
         }
 
-        .card-info {
-            padding: 10px 15px;
-            flex-grow: 1;
-        }
+        /* 说明文字 */
+        .info { padding: 10px 15px; flex-grow: 1; }
+        .num { font-size: 0.8rem; color: #888; font-family: monospace; }
+        .desc { font-size: 0.95rem; margin-top: 3px; }
 
-        /* 不同颜色的卡片 */
-        .bg-red { background: #b01a1a; }
-        .bg-purple { background: #8e24aa; }
-        .bg-blue { background: #1e88e5; }
+        /* 错位排版效果 */
+        .offset-1 { margin-left: 20px; background: #334455; }
+        .offset-2 { margin-left: -10px; background: #443355; }
     </style>
 </head>
 <body>
 
     <div class="about-card">
-        <h2>ABOUT</h2>
-        <p>喜欢收集可爱的东西，比如 <span class="highlight">sony angels</span> 和各种盲盒。✨</p>
-        <p class="highlight">before you interact</p>
-        <p>这里分享我的游戏日常和收藏品。</p>
+        <h2>ABOUT ME 🐈‍⬛</h2>
+        <p>有一只<span class="highlight">黑猫</span>的<strong>大阪在住社畜</strong>。</p>
+        <p>记录一些碎碎念和生活碎片 ✨</p>
     </div>
 
-    <div class="card-container">
+    <div class="container">
         
-        <div class="card bg-red" style="margin-left: 20px;">
-            <img src="https://via.placeholder.com/80" alt="cover">
-            <div class="card-info">
-                <strong>照片编号 #001</strong><br>
-                <small>描述文字放在这里</small>
+        <div class="photo-card">
+            <img src="1.jpeg" alt="cat">
+            <div class="info">
+                <div class="num">#01</div>
+                <div class="desc">我的黑猫主子，眼神犀利。</div>
             </div>
         </div>
 
-        <div class="card bg-purple">
-            <img src="https://via.placeholder.com/80" alt="cover">
-            <div class="card-info">
-                <strong>照片编号 #002</strong><br>
-                <small>Sidechain Fever - LJ</small>
+        <div class="photo-card offset-1">
+            <img src="2.jpeg" alt="cat">
+            <div class="info">
+                <div class="num">#02</div>
+                <div class="desc">社畜下班后的治愈时刻。</div>
             </div>
         </div>
 
-        <div class="card bg-blue" style="margin-left: 10px;">
-            <img src="https://via.placeholder.com/80" alt="cover">
-            <div class="card-info">
-                <strong>照片编号 #003</strong><br>
-                <small>Dance Dance - Lexie Liu</small>
+        <div class="photo-card offset-2">
+            <img src="3.jpeg" alt="Osaka">
+            <div class="info">
+                <div class="num">#03</div>
+                <div class="desc">可爱的公仔收藏。</div>
+            </div>
+        </div>
+
+        <div class="photo-card">
+            <img src="4.jpeg" alt="Osaka">
+            <div class="info">
+                <div class="num">#04</div>
+                <div class="desc">大阪生活的点滴。</div>
+            </div>
+        </div>
+
+        <div class="photo-card offset-1">
+            <img src="5.jpeg" alt="Food">
+            <div class="info">
+                <div class="num">#05</div>
+                <div class="desc">超市里的美食诱惑。</div>
+            </div>
+        </div>
+
+        <div class="photo-card">
+            <img src="6.jpeg" alt="Scenery">
+            <div class="info">
+                <div class="num">#06</div>
+                <div class="desc">大阪的晚霞。</div>
+            </div>
+        </div>
+
+        <div class="photo-card offset-2">
+            <img src="7.jpeg" alt="Life">
+            <div class="info">
+                <div class="num">#07</div>
+                <div class="desc">街头的节日气氛。</div>
+            </div>
+        </div>
+
+        <div class="photo-card">
+            <img src="8.jpeg" alt="Life">
+            <div class="info">
+                <div class="num">#08</div>
+                <div class="desc">散步发现的小惊喜。</div>
             </div>
         </div>
 
