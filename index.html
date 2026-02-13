@@ -60,6 +60,23 @@
         /* 错位排版效果 */
         .offset-1 { margin-left: 20px; background: #334455; }
         .offset-2 { margin-left: -10px; background: #443355; }
+   /* 大图层 */
+        .lightbox {
+            display: none;
+            position: fixed;
+            z-index: 999;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            justify-content: center;
+            align-items: center;
+            cursor: zoom-out;
+        }
+        .lightbox img {
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: 8px;
+        }
     </style>
 </head>
 <body>
@@ -137,6 +154,22 @@
         </div>
 
     </div>
+<div id="lightbox" class="lightbox" onclick="this.style.display='none'">
+        <img id="lightbox-img" src="">
+    </div>
 
+    <script>
+        const cards = document.querySelectorAll('.photo-card img');
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImg = document.getElementById('lightbox-img');
+
+        cards.forEach(img => {
+            img.style.cursor = 'zoom-in';
+            img.onclick = function() {
+                lightbox.style.display = 'flex';
+                lightboxImg.src = this.src;
+            }
+        });
+    </script>
 </body>
 </html>
