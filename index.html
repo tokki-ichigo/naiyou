@@ -14,7 +14,7 @@
             display: flex; flex-direction: column; align-items: center;
         }
 
-        /* 顶部卡片 */
+        /* 顶部关于我 */
         .about-card {
             background: white;
             border: 2px solid #333;
@@ -27,7 +27,6 @@
             text-align: center;
             position: relative;
         }
-        /* 这里的 content 可以换成你喜欢的猫咪 Emoji */
         .about-card::after {
             content: '🐈‍⬛';
             font-size: 35px;
@@ -37,18 +36,7 @@
             transform: rotate(15deg);
         }
 
-        .highlight { background: #333; color: white; padding: 0 5px; }
-
-        /* 🎵 音乐播放器容器 */
-        .music-container {
-            margin: 0 auto 20px auto;
-            width: 100%;
-            max-width: 400px;
-            padding: 0 10px;
-            box-sizing: border-box;
-        }
-
-        /* 🐾 黑色猫爪按钮 */
+        /* 黑色猫爪按钮 */
         .reveal-btn {
             background: #1a1a1a;
             color: #ffcc00;
@@ -60,57 +48,71 @@
             margin: 10px 0 30px 0;
             box-shadow: 4px 4px 0px #666;
             transition: 0.2s;
-            font-size: 1rem;
             display: flex;
             align-items: center;
             gap: 10px;
         }
         .reveal-btn:active { transform: scale(0.95); box-shadow: 1px 1px 0px #000; }
 
-        /* 照片墙容器：实现并列的关键 */
+        /* 照片网格 */
         .photo-grid {
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
-            gap: 12px;
+            gap: 20px;
             width: 100%;
             max-width: 500px;
+            margin-top: 20px;
         }
 
-        /* 照片卡片：一行两个 */
-        .photo-item {
-            display: none; 
-            background: #222;
-            color: white;
-            border-radius: 12px;
-            overflow: hidden;
-            width: calc(50% - 6px); /* 50% 宽度减去间距 */
+        /* 📸 拍立得卡通样式 */
+        .polaroid {
+            display: none; /* 初始隐藏 */
+            background: white;
+            padding: 10px 10px 25px 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            width: calc(50% - 25px);
             flex-direction: column;
             opacity: 0;
-            transform: scale(0.8);
+            transform: rotate(-3deg) scale(0.8);
             transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
         }
 
-        .photo-item.show { display: flex; opacity: 1; transform: scale(1); }
+        /* 奇数张照片稍微向右倾斜，增加随机感 */
+        .polaroid:nth-child(even) { transform: rotate(3deg) scale(0.8); }
 
-        .photo-item img { width: 100%; height: 140px; object-fit: cover; cursor: zoom-in; }
+        .polaroid.show {
+            display: flex;
+            opacity: 1;
+            transform: rotate(0deg) scale(1);
+        }
 
-        .photo-info { padding: 8px 10px; background: #2a2a2a; }
-        .photo-num { font-size: 0.7rem; color: #888; font-family: monospace; }
-        .photo-desc { font-size: 0.8rem; margin-top: 2px; }
+        .polaroid img {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            object-fit: cover;
+            border: 1px solid #eee;
+            cursor: zoom-in;
+        }
 
-        /* 大图层 */
+        .polaroid-info {
+            margin-top: 10px;
+            text-align: center;
+            font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+        }
+        .p-num { font-size: 0.6rem; color: #aaa; font-weight: bold; }
+        .p-desc { font-size: 0.8rem; color: #444; margin-top: 2px; }
+
+        /* 大图预览 */
         .lightbox {
             display: none; position: fixed; z-index: 999;
             top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0, 0, 0, 0.9); justify-content: center; align-items: center; cursor: zoom-out;
         }
-        .lightbox img { max-width: 90%; max-height: 90%; border-radius: 8px; }
+        .lightbox img { max-width: 90%; max-height: 90%; border-radius: 4px; border: 5px solid white; }
 
-        /* 针对极小屏幕手机的适配 */
-        @media (max-width: 350px) {
-            .photo-item { width: 100%; }
+        @media (max-width: 400px) {
+            .polaroid { width: 100%; }
         }
     </style>
 </head>
@@ -118,11 +120,11 @@
 
     <div class="about-card">
         <h2>ABOUT ME 🐾</h2>
-        <p>有一只<span class="highlight">黑猫</span>的<strong>大阪在住社畜</strong></p>
+        <p>有一只<strong>黑猫</strong>的大阪在住社畜</p>
         <p>记录一些碎碎念和生活碎片 ✨</p>
     </div>
 
-    <div class="music-container">
+    <div style="margin: 0 auto 20px auto; width: 100%; max-width: 400px; padding: 0 10px; box-sizing: border-box;">
         <iframe data-testid="embed-iframe" style="border-radius:12px" src="https://open.spotify.com/embed/track/2YF2QvEFNGbIgNQaUzLk4Q?utm_source=generator" width="100%" height="152" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
     </div>
 
@@ -131,14 +133,14 @@
     </button>
 
     <div class="photo-grid" id="photo-grid">
-        <div class="photo-item"><img src="1.jpeg"><div class="photo-info"><div class="photo-num">#01</div><div class="photo-desc">我的黑猫奶油</div></div></div>
-        <div class="photo-item"><img src="2.jpeg"><div class="photo-info"><div class="photo-num">#02</div><div class="photo-desc">下班治愈时刻</div></div></div>
-        <div class="photo-item"><img src="3.jpeg"><div class="photo-info"><div class="photo-num">#03</div><div class="photo-desc">可爱的小狗</div></div></div>
-        <div class="photo-item"><img src="4.jpeg"><div class="photo-info"><div class="photo-num">#04</div><div class="photo-desc">大阪生活点滴</div></div></div>
-        <div class="photo-item"><img src="5.jpeg"><div class="photo-info"><div class="photo-num">#05</div><div class="photo-desc">便利店美食</div></div></div>
-        <div class="photo-item"><img src="6.jpeg"><div class="photo-info"><div class="photo-num">#06</div><div class="photo-desc">电车晚霞</div></div></div>
-        <div class="photo-item"><img src="7.jpeg"><div class="photo-info"><div class="photo-num">#07</div><div class="photo-desc">节日气氛</div></div></div>
-        <div class="photo-item"><img src="8.jpeg"><div class="photo-info"><div class="photo-num">#08</div><div class="photo-desc">奈良的鹿🦌</div></div></div>
+        <div class="polaroid"><img src="1.jpeg"><div class="polaroid-info"><div class="p-num">#01</div><div class="p-desc">我的黑猫奶油</div></div></div>
+        <div class="polaroid"><img src="2.jpeg"><div class="polaroid-info"><div class="p-num">#02</div><div class="p-desc">下班治愈时刻</div></div></div>
+        <div class="polaroid"><img src="3.jpeg"><div class="polaroid-info"><div class="p-num">#03</div><div class="p-desc">可爱的小狗</div></div></div>
+        <div class="polaroid"><img src="4.jpeg"><div class="polaroid-info"><div class="p-num">#04</div><div class="p-desc">大阪生活点滴</div></div></div>
+        <div class="polaroid"><img src="5.jpeg"><div class="polaroid-info"><div class="p-num">#05</div><div class="p-desc">便利店美食</div></div></div>
+        <div class="polaroid"><img src="6.jpeg"><div class="polaroid-info"><div class="p-num">#06</div><div class="p-desc">电车晚霞</div></div></div>
+        <div class="polaroid"><img src="7.jpeg"><div class="polaroid-info"><div class="p-num">#07</div><div class="p-desc">节日气氛</div></div></div>
+        <div class="polaroid"><img src="8.jpeg"><div class="polaroid-info"><div class="p-num">#08</div><div class="p-desc">奈良的鹿🦌</div></div></div>
     </div>
 
     <div id="lightbox" class="lightbox" onclick="this.style.display='none'">
@@ -147,7 +149,7 @@
 
     <script>
         const btn = document.getElementById('reveal-btn');
-        const items = document.querySelectorAll('.photo-item');
+        const items = document.querySelectorAll('.polaroid');
         let count = 0;
 
         btn.onclick = function() {
@@ -167,7 +169,7 @@
 
         const lightbox = document.getElementById('lightbox');
         const lightboxImg = document.getElementById('lightbox-img');
-        document.querySelectorAll('.photo-item img').forEach(img => {
+        document.querySelectorAll('.polaroid img').forEach(img => {
             img.onclick = function() {
                 lightbox.style.display = 'flex';
                 lightboxImg.src = this.src;
