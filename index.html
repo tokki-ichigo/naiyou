@@ -14,6 +14,7 @@
             display: flex; flex-direction: column; align-items: center;
         }
 
+        /* 关于我卡片 */
         .about-card {
             background: white;
             border: 2px solid #333;
@@ -27,7 +28,7 @@
         .about-card h2 { margin-top: 0; font-size: 1.2rem; border-bottom: 2px solid #f0f4f0; padding-bottom: 5px; }
         .highlight { background: #333; color: white; padding: 0 5px; }
 
-        /* 猫爪按钮：这次它不会消失，所以我们加点点击跳动效果 */
+        /* 猫爪按钮 */
         .reveal-btn {
             background: #ffcc00;
             color: #333;
@@ -36,18 +37,17 @@
             font-weight: bold;
             border-radius: 50px;
             cursor: pointer;
-            margin: 20px 0 30px 0;
+            margin: 10px 0 30px 0;
             box-shadow: 4px 4px 0px #333;
             transition: 0.1s;
             font-size: 1rem;
             z-index: 10;
         }
-        .reveal-btn:hover { background: #ffe066; }
         .reveal-btn:active { transform: scale(0.9) translate(2px, 2px); box-shadow: 1px 1px 0px #333; }
 
-        /* 照片卡片：默认是隐藏且缩小的 */
+        /* 照片卡片基础样式 */
         .photo-card {
-            display: none; /* 初始完全不占用空间 */
+            display: none; 
             align-items: center;
             background: #222;
             color: white;
@@ -60,7 +60,7 @@
             transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        /* 激活状态：Q弹跳出 */
+        /* 激活显示照片 */
         .photo-card.show {
             display: flex;
             opacity: 1;
@@ -75,6 +75,7 @@
         .offset-1 { margin-left: 20px; background: #334455; }
         .offset-2 { margin-left: -10px; background: #443355; }
 
+        /* 大图层 */
         .lightbox {
             display: none;
             position: fixed;
@@ -99,11 +100,11 @@
         <p>记录一些碎碎念和生活碎片 ✨</p>
     </div>
 
-    <div style="margin: 0 auto 20px auto; width: 100%; max-width: 400px; padding: 0 10px; box-sizing: border-box;">
-        <iframe style="border-radius:12px" src="https://open.spotify.com/embed/track/1v9X0E01v5O1Wj680R1O4N" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+    <div style="margin: 0 auto 15px auto; width: 100%; max-width: 400px; padding: 0 10px; box-sizing: border-box;">
+        <iframe data-testid="embed-iframe" style="border-radius:12px" src="https://open.spotify.com/embed/track/2YF2QvEFNGbIgNQaUzLk4Q?utm_source=generator" width="100%" height="152" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
     </div>
 
-    <button class="reveal-btn" id="spawn-btn">🐾 喂奶油一张照片</button>
+    <button class="reveal-btn" id="spawn-btn">🐾 喂一张奶油的照片</button>
 
     <div class="container" id="photo-container">
         <div class="photo-card"><img src="1.jpeg"><div class="info"><div class="num">#01</div><div class="desc">我的黑猫奶油</div></div></div>
@@ -123,33 +124,28 @@
     <script>
         const cards = document.querySelectorAll('.photo-card');
         const spawnBtn = document.getElementById('spawn-btn');
-        let currentIndex = 0; // 记录当前出场到第几张了
+        let currentIndex = 0; 
 
-        // 每次点击猫爪
+        // 每次点击猫爪，蹦出一张
         spawnBtn.onclick = function() {
             if (currentIndex < cards.length) {
                 const card = cards[currentIndex];
-                card.style.display = 'flex'; // 先变为可见
+                card.style.display = 'flex'; 
                 
-                // 稍微延迟一点触发 CSS 动画，确保动画能跑出来
                 setTimeout(() => {
                     card.classList.add('show');
-                    // 自动滚动到底部，方便看新出的卡片
                     card.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 }, 50);
 
-                currentIndex++; // 准备下一张
+                currentIndex++; 
 
-                // 如果照片全部抽完了，改变按钮文字
                 if (currentIndex === cards.length) {
                     this.innerHTML = "✨ 全部收集齐啦！";
-                    this.style.background = "#d1e0d1";
-                    this.style.cursor = "default";
                 }
             }
         };
 
-        // 大图预览逻辑
+        // 大图预览
         const lightbox = document.getElementById('lightbox');
         const lightboxImg = document.getElementById('lightbox-img');
         document.querySelectorAll('.photo-card img').forEach(img => {
