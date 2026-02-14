@@ -71,14 +71,14 @@
             background: white;
             padding: 8px 8px 20px 8px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            width: calc(50% - 10px); /* 一行两个 */
+            width: calc(50% - 10px); /* 强制一行两个 */
             box-sizing: border-box;
             flex-direction: column;
             opacity: 0;
             transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        /* 增加随性感：让照片左右轻微倾斜 */
+        /* 随性感旋转 */
         .polaroid:nth-child(odd) { transform: rotate(-3deg) scale(0.8); }
         .polaroid:nth-child(even) { transform: rotate(2deg) scale(0.8); }
 
@@ -86,7 +86,6 @@
             display: flex;
             opacity: 1;
         }
-        /* 出现后保留一点倾斜，更有卡通活泼感 */
         .polaroid.show:nth-child(odd) { transform: rotate(-2deg) scale(1); }
         .polaroid.show:nth-child(even) { transform: rotate(1deg) scale(1); }
 
@@ -105,7 +104,7 @@
         .p-num { font-size: 0.6rem; color: #bbb; font-family: monospace; }
         .p-desc { font-size: 0.75rem; color: #444; margin-top: 2px; }
 
-        /* 大图层 */
+        /* 大图预览层 */
         .lightbox {
             display: none; position: fixed; z-index: 999;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -113,9 +112,9 @@
         }
         .lightbox img { max-width: 90%; max-height: 90%; border: 5px solid white; }
 
-        /* 针对极窄屏幕手机 */
-        @media (max-width: 320px) {
-            .polaroid { width: 100%; }
+        /* 手机适配 */
+        @media (max-width: 380px) {
+            .polaroid { width: calc(50% - 10px); }
         }
     </style>
 </head>
@@ -128,7 +127,7 @@
     </div>
 
     <div style="margin: 0 auto 20px auto; width: 100%; max-width: 400px; padding: 0 10px; box-sizing: border-box;">
-        <iframe data-testid="embed-iframe" style="border-radius:12px" src="https://open.spotify.com/embed/track/2YF2QvEFNGbIgNQaUzLk4Q?utm_source=generator" width="100%" height="152" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+        <iframe data-testid="embed-iframe" style="border-radius:12px" src="https://open.spotify.com/embed/track/1L38VzY6jYdY6Y6jYdY6Y6" width="100%" height="152" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
     </div>
 
     <button class="reveal-btn" id="reveal-btn">
@@ -136,4 +135,51 @@
     </button>
 
     <div class="photo-grid" id="photo-grid">
-        <div class="polaroid"><img src="1.jpeg"><div class="polaroid-info"><div class
+        <div class="polaroid"><img src="1.jpeg"><div class="polaroid-info"><div class="p-num">#01</div><div class="p-desc">我的黑猫奶油</div></div></div>
+        <div class="polaroid"><img src="2.jpeg"><div class="polaroid-info"><div class="p-num">#02</div><div class="p-desc">下班治愈时刻</div></div></div>
+        <div class="polaroid"><img src="3.jpeg"><div class="polaroid-info"><div class="p-num">#03</div><div class="p-desc">可爱的小狗</div></div></div>
+        <div class="polaroid"><img src="4.jpeg"><div class="polaroid-info"><div class="p-num">#04</div><div class="p-desc">大阪生活点滴</div></div></div>
+        <div class="polaroid"><img src="5.jpeg"><div class="polaroid-info"><div class="p-num">#05</div><div class="p-desc">便利店美食</div></div></div>
+        <div class="polaroid"><img src="6.jpeg"><div class="polaroid-info"><div class="p-num">#06</div><div class="p-desc">电车晚霞</div></div></div>
+        <div class="polaroid"><img src="7.jpeg"><div class="polaroid-info"><div class="p-num">#07</div><div class="p-desc">节日气氛</div></div></div>
+        <div class="polaroid"><img src="8.jpeg"><div class="polaroid-info"><div class="p-num">#08</div><div class="p-desc">奈良的鹿🦌</div></div></div>
+    </div>
+
+    <div id="lightbox" class="lightbox" onclick="this.style.display='none'">
+        <img id="lightbox-img" src="">
+    </div>
+
+    <script>
+        const btn = document.getElementById('reveal-btn');
+        const items = document.querySelectorAll('.polaroid');
+        let count = 0;
+
+        btn.onclick = function() {
+            if (count < items.length) {
+                const item = items[count];
+                item.style.display = 'flex'; // 确保卡片显示
+                setTimeout(() => {
+                    item.classList.add('show');
+                    // 只在手机端自动滚动，防止电脑端布局跳动
+                    if(window.innerWidth < 500) {
+                        item.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                }, 50);
+                count++;
+                if (count === items.length) {
+                    this.innerHTML = "✨ 全部收集齐啦！";
+                }
+            }
+        };
+
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImg = document.getElementById('lightbox-img');
+        document.querySelectorAll('.polaroid img').forEach(img => {
+            img.onclick = function() {
+                lightbox.style.display = 'flex';
+                lightboxImg.src = this.src;
+            }
+        });
+    </script>
+</body>
+</html>
