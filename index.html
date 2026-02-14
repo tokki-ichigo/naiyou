@@ -14,7 +14,7 @@
             display: flex; flex-direction: column; align-items: center;
         }
 
-        /* 关于我卡片 */
+        /* 顶部关于我卡片 */
         .about-card {
             background: white;
             border: 2px solid #333;
@@ -24,28 +24,42 @@
             box-shadow: 6px 6px 0px #333;
             border-radius: 4px;
             text-align: center;
+            position: relative;
         }
+        
+        /* 🐱 新增：卡片上方的小猫装饰 */
+        .about-card::before {
+            content: '🐈‍⬛';
+            font-size: 40px;
+            position: absolute;
+            top: -35px;
+            right: 10px;
+        }
+
         .about-card h2 { margin-top: 0; font-size: 1.2rem; border-bottom: 2px solid #f0f4f0; padding-bottom: 5px; }
         .highlight { background: #333; color: white; padding: 0 5px; }
 
-        /* 猫爪按钮 */
+        /* 🐾 黑色猫爪按钮 */
         .reveal-btn {
-            background: #ffcc00;
-            color: #333;
-            border: 2px solid #333;
+            background: #222; /* 调成黑色 */
+            color: #ffcc00; /* 文字用猫眼黄，对比度高 */
+            border: 2px solid #000;
             padding: 12px 25px;
             font-weight: bold;
             border-radius: 50px;
             cursor: pointer;
-            margin: 10px 0 30px 0;
-            box-shadow: 4px 4px 0px #333;
+            margin: 20px 0 30px 0;
+            box-shadow: 4px 4px 0px #666;
             transition: 0.1s;
             font-size: 1rem;
-            z-index: 10;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
-        .reveal-btn:active { transform: scale(0.9) translate(2px, 2px); box-shadow: 1px 1px 0px #333; }
+        .reveal-btn:hover { background: #333; transform: scale(1.02); }
+        .reveal-btn:active { transform: scale(0.95) translate(2px, 2px); box-shadow: 1px 1px 0px #000; }
 
-        /* 照片卡片基础样式 */
+        /* 照片卡片样式 */
         .photo-card {
             display: none; 
             align-items: center;
@@ -58,37 +72,22 @@
             opacity: 0;
             transform: scale(0.8) translateY(20px);
             transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            width: 100%;
+            max-width: 400px;
         }
-
-        /* 激活显示照片 */
-        .photo-card.show {
-            display: flex;
-            opacity: 1;
-            transform: scale(1) translateY(0);
-        }
-
+        .photo-card.show { display: flex; opacity: 1; transform: scale(1) translateY(0); }
         .photo-card img { width: 90px; height: 90px; object-fit: cover; border-right: 2px solid #444; cursor: zoom-in; }
         .info { padding: 10px 15px; flex-grow: 1; }
         .num { font-size: 0.8rem; color: #888; font-family: monospace; }
         .desc { font-size: 0.95rem; margin-top: 3px; }
 
-        .offset-1 { margin-left: 20px; background: #334455; }
-        .offset-2 { margin-left: -10px; background: #443355; }
-
-        /* 大图层 */
+        /* 大图预览层 */
         .lightbox {
-            display: none;
-            position: fixed;
-            z-index: 999;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.9);
-            justify-content: center;
-            align-items: center;
-            cursor: zoom-out;
+            display: none; position: fixed; z-index: 999;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.9); justify-content: center; align-items: center; cursor: zoom-out;
         }
         .lightbox img { max-width: 90%; max-height: 90%; border-radius: 8px; }
-        
         .container { width: 100%; max-width: 400px; }
     </style>
 </head>
@@ -100,60 +99,24 @@
         <p>记录一些碎碎念和生活碎片 ✨</p>
     </div>
 
-    <div style="margin: 0 auto 15px auto; width: 100%; max-width: 400px; padding: 0 10px; box-sizing: border-box;">
-        <iframe data-testid="embed-iframe" style="border-radius:12px" src="https://open.spotify.com/embed/track/2YF2QvEFNGbIgNQaUzLk4Q?utm_source=generator" width="100%" height="152" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+    <div style="margin: 0 auto 20px auto; width: 100%; max-width: 400px; padding: 0 10px; box-sizing: border-box; min-height: 152px;">
+        <iframe style="border-radius:12px" 
+            src="https://open.spotify.com/embed/track/6UelLpsCveA9f69Kcy8fUC?utm_source=generator" 
+            width="100%" height="152" 
+            frameBorder="0" allowfullscreen="" 
+            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
+            loading="lazy">
+        </iframe>
     </div>
 
-    <button class="reveal-btn" id="spawn-btn">🐾 喂一张奶油的照片</button>
+    <button class="reveal-btn" id="spawn-btn">
+        <span>🐾</span> 喂一张奶油的照片
+    </button>
 
     <div class="container" id="photo-container">
         <div class="photo-card"><img src="1.jpeg"><div class="info"><div class="num">#01</div><div class="desc">我的黑猫奶油</div></div></div>
-        <div class="photo-card offset-1"><img src="2.jpeg"><div class="info"><div class="num">#02</div><div class="desc">社畜下班后的治愈时刻</div></div></div>
-        <div class="photo-card offset-2"><img src="3.jpeg"><div class="info"><div class="num">#03</div><div class="desc">可爱的跟玩偶一样的小狗</div></div></div>
+        <div class="photo-card" style="margin-left: 20px; background: #334455;"><img src="2.jpeg"><div class="info"><div class="num">#02</div><div class="desc">社畜下班后的治愈时刻</div></div></div>
+        <div class="photo-card" style="margin-left: -10px; background: #443355;"><img src="3.jpeg"><div class="info"><div class="num">#03</div><div class="desc">可爱的跟玩偶一样的小狗</div></div></div>
         <div class="photo-card"><img src="4.jpeg"><div class="info"><div class="num">#04</div><div class="desc">大阪生活的点滴</div></div></div>
-        <div class="photo-card offset-1"><img src="5.jpeg"><div class="info"><div class="num">#05</div><div class="desc">便利店的美食诱惑</div></div></div>
-        <div class="photo-card"><img src="6.jpeg"><div class="info"><div class="num">#06</div><div class="desc">电车上看到的晚霞</div></div></div>
-        <div class="photo-card offset-2"><img src="7.jpeg"><div class="info"><div class="num">#07</div><div class="desc">街头的节日气氛</div></div></div>
-        <div class="photo-card"><img src="8.jpeg"><div class="info"><div class="num">#08</div><div class="desc">奈良公园和🦌散步</div></div></div>
-    </div>
-
-    <div id="lightbox" class="lightbox" onclick="this.style.display='none'">
-        <img id="lightbox-img" src="">
-    </div>
-
-    <script>
-        const cards = document.querySelectorAll('.photo-card');
-        const spawnBtn = document.getElementById('spawn-btn');
-        let currentIndex = 0; 
-
-        // 每次点击猫爪，蹦出一张
-        spawnBtn.onclick = function() {
-            if (currentIndex < cards.length) {
-                const card = cards[currentIndex];
-                card.style.display = 'flex'; 
-                
-                setTimeout(() => {
-                    card.classList.add('show');
-                    card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }, 50);
-
-                currentIndex++; 
-
-                if (currentIndex === cards.length) {
-                    this.innerHTML = "✨ 全部收集齐啦！";
-                }
-            }
-        };
-
-        // 大图预览
-        const lightbox = document.getElementById('lightbox');
-        const lightboxImg = document.getElementById('lightbox-img');
-        document.querySelectorAll('.photo-card img').forEach(img => {
-            img.onclick = function() {
-                lightbox.style.display = 'flex';
-                lightboxImg.src = this.src;
-            }
-        });
-    </script>
-</body>
-</html>
+        <div class="photo-card" style="margin-left: 20px; background: #334455;"><img src="5.jpeg"><div class="info"><div class="num">#05</div><div class="desc">便利店的美食诱惑</div></div></div>
+        <div class="photo-card"><img src="6.jpeg"><div class="info"><div class="num">#06</div><div class="desc">电车
