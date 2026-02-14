@@ -14,7 +14,6 @@
             display: flex; flex-direction: column; align-items: center;
         }
 
-        /* 关于我卡片 */
         .about-card {
             background: white;
             border: 2px solid #333;
@@ -28,7 +27,7 @@
         .about-card h2 { margin-top: 0; font-size: 1.2rem; border-bottom: 2px solid #f0f4f0; padding-bottom: 5px; }
         .highlight { background: #333; color: white; padding: 0 5px; }
 
-        /* 出场按钮 */
+        /* 猫爪按钮：这次它不会消失，所以我们加点点击跳动效果 */
         .reveal-btn {
             background: #ffcc00;
             color: #333;
@@ -39,25 +38,16 @@
             cursor: pointer;
             margin: 20px 0 30px 0;
             box-shadow: 4px 4px 0px #333;
-            transition: 0.2s;
+            transition: 0.1s;
             font-size: 1rem;
+            z-index: 10;
         }
-        .reveal-btn:hover { background: #ffe066; transform: scale(1.05); }
-        .reveal-btn:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0px #333; }
+        .reveal-btn:hover { background: #ffe066; }
+        .reveal-btn:active { transform: scale(0.9) translate(2px, 2px); box-shadow: 1px 1px 0px #333; }
 
-        /* 照片容器 */
-        .container { 
-            width: 100%; 
-            max-width: 400px; 
-            display: none; 
-            opacity: 0;
-            transform: translateY(30px);
-            transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        .container.show { display: block; opacity: 1; transform: translateY(0); }
-
+        /* 照片卡片：默认是隐藏且缩小的 */
         .photo-card {
-            display: flex;
+            display: none; /* 初始完全不占用空间 */
             align-items: center;
             background: #222;
             color: white;
@@ -65,11 +55,19 @@
             margin-bottom: 15px;
             overflow: hidden;
             box-shadow: 4px 4px 10px rgba(0,0,0,0.1);
-            transition: 0.3s;
+            opacity: 0;
+            transform: scale(0.8) translateY(20px);
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        .photo-card:hover { transform: translateY(-3px); }
-        .photo-card img { width: 90px; height: 90px; object-fit: cover; border-right: 2px solid #444; cursor: zoom-in; }
 
+        /* 激活状态：Q弹跳出 */
+        .photo-card.show {
+            display: flex;
+            opacity: 1;
+            transform: scale(1) translateY(0);
+        }
+
+        .photo-card img { width: 90px; height: 90px; object-fit: cover; border-right: 2px solid #444; cursor: zoom-in; }
         .info { padding: 10px 15px; flex-grow: 1; }
         .num { font-size: 0.8rem; color: #888; font-family: monospace; }
         .desc { font-size: 0.95rem; margin-top: 3px; }
@@ -77,7 +75,6 @@
         .offset-1 { margin-left: 20px; background: #334455; }
         .offset-2 { margin-left: -10px; background: #443355; }
 
-        /* 大图层 */
         .lightbox {
             display: none;
             position: fixed;
@@ -90,6 +87,8 @@
             cursor: zoom-out;
         }
         .lightbox img { max-width: 90%; max-height: 90%; border-radius: 8px; }
+        
+        .container { width: 100%; max-width: 400px; }
     </style>
 </head>
 <body>
@@ -101,16 +100,10 @@
     </div>
 
     <div style="margin: 0 auto 20px auto; width: 100%; max-width: 400px; padding: 0 10px; box-sizing: border-box;">
-        <iframe style="border-radius:12px" 
-            src="https://open.spotify.com/embed/track/2mF1u6M0G6o1fL5k5S7e8X?utm_source=generator" 
-            width="100%" height="352" 
-            frameBorder="0" allowfullscreen="" 
-            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
-            loading="lazy">
-        </iframe>
+        <iframe style="border-radius:12px" src="https://open.spotify.com/embed/track/1v9X0E01v5O1Wj680R1O4N" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
     </div>
 
-    <button class="reveal-btn" id="show-photos">🐾 开启奶油的日常</button>
+    <button class="reveal-btn" id="spawn-btn">🐾 喂奶油一张照片</button>
 
     <div class="container" id="photo-container">
         <div class="photo-card"><img src="1.jpeg"><div class="info"><div class="num">#01</div><div class="desc">我的黑猫奶油</div></div></div>
@@ -128,23 +121,38 @@
     </div>
 
     <script>
-        const cards = document.querySelectorAll('.photo-card img');
+        const cards = document.querySelectorAll('.photo-card');
+        const spawnBtn = document.getElementById('spawn-btn');
+        let currentIndex = 0; // 记录当前出场到第几张了
+
+        // 每次点击猫爪
+        spawnBtn.onclick = function() {
+            if (currentIndex < cards.length) {
+                const card = cards[currentIndex];
+                card.style.display = 'flex'; // 先变为可见
+                
+                // 稍微延迟一点触发 CSS 动画，确保动画能跑出来
+                setTimeout(() => {
+                    card.classList.add('show');
+                    // 自动滚动到底部，方便看新出的卡片
+                    card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 50);
+
+                currentIndex++; // 准备下一张
+
+                // 如果照片全部抽完了，改变按钮文字
+                if (currentIndex === cards.length) {
+                    this.innerHTML = "✨ 全部收集齐啦！";
+                    this.style.background = "#d1e0d1";
+                    this.style.cursor = "default";
+                }
+            }
+        };
+
+        // 大图预览逻辑
         const lightbox = document.getElementById('lightbox');
         const lightboxImg = document.getElementById('lightbox-img');
-        const showBtn = document.getElementById('show-photos');
-        const container = document.getElementById('photo-container');
-
-        if(showBtn) {
-            showBtn.onclick = function() {
-                container.style.display = 'block'; 
-                setTimeout(() => {
-                    container.classList.add('show'); 
-                }, 10);
-                this.style.display = 'none';
-            };
-        }
-
-        cards.forEach(img => {
+        document.querySelectorAll('.photo-card img').forEach(img => {
             img.onclick = function() {
                 lightbox.style.display = 'flex';
                 lightboxImg.src = this.src;
