@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tokki的个人主页</title>
     <style>
-        /* 复刻你发的那张卡片背景色和格子纹理 */
         body {
             background-color: #f0f4f0;
             background-image: radial-gradient(#d1e0d1 1px, transparent 1px);
@@ -15,7 +14,7 @@
             display: flex; flex-direction: column; align-items: center;
         }
 
-        /* 顶部关于我卡片 */
+        /* 关于我卡片样式 */
         .about-card {
             background: white;
             border: 2px solid #333;
@@ -24,6 +23,7 @@
             margin-bottom: 25px;
             box-shadow: 6px 6px 0px #333;
             border-radius: 4px;
+            text-align: center;
         }
         .about-card h2 { margin-top: 0; font-size: 1.2rem; border-bottom: 2px solid #f0f4f0; padding-bottom: 5px; }
         .highlight { background: #333; color: white; padding: 0 5px; }
@@ -31,11 +31,10 @@
         /* 卡片容器 */
         .container { width: 100%; max-width: 400px; }
 
-        /* 单个照片卡片样式 */
         .photo-card {
             display: flex;
             align-items: center;
-            background: #222; /* 黑猫深色背景 */
+            background: #222;
             color: white;
             border-radius: 12px;
             margin-bottom: 15px;
@@ -45,22 +44,21 @@
         }
         .photo-card:hover { transform: translateY(-3px); }
 
-        /* 照片显示 */
         .photo-card img {
             width: 90px; height: 90px;
             object-fit: cover;
             border-right: 2px solid #444;
+            cursor: zoom-in;
         }
 
-        /* 说明文字 */
         .info { padding: 10px 15px; flex-grow: 1; }
         .num { font-size: 0.8rem; color: #888; font-family: monospace; }
         .desc { font-size: 0.95rem; margin-top: 3px; }
 
-        /* 错位排版效果 */
         .offset-1 { margin-left: 20px; background: #334455; }
         .offset-2 { margin-left: -10px; background: #443355; }
-   /* 大图层 */
+
+        /* 大图层 */
         .lightbox {
             display: none;
             position: fixed;
@@ -81,83 +79,28 @@
 </head>
 <body>
 
-    
-        <div style="margin: 25px auto; max-width: 400px; padding: 0 10px;">
-        <iframe data-testid="embed-iframe" style="border-radius:12px" src="https://open.spotify.com/embed/track/2YF2QvEFNGbIgNQaUzLk4Q?utm_source=generator" width="100%" height="152" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
-    </div>
+    <div class="about-card">
         <h2>ABOUT ME 🐈‍⬛</h2>
         <p>有一只<span class="highlight">黑猫</span>的<strong>大阪在住社畜</strong></p>
         <p>记录一些碎碎念和生活碎片 ✨</p>
     </div>
 
-    <div class="container">
-        
-        <div class="photo-card">
-            <img src="1.jpeg" alt="cat">
-            <div class="info">
-                <div class="num">#01</div>
-                <div class="desc">我的黑猫奶油</div>
-            </div>
-        </div>
-
-        <div class="photo-card offset-1">
-            <img src="2.jpeg" alt="cat">
-            <div class="info">
-                <div class="num">#02</div>
-                <div class="desc">社畜下班后的治愈时刻</div>
-            </div>
-        </div>
-
-        <div class="photo-card offset-2">
-            <img src="3.jpeg" alt="Osaka">
-            <div class="info">
-                <div class="num">#03</div>
-                <div class="desc">可爱的跟玩偶一样的小狗</div>
-            </div>
-        </div>
-
-        <div class="photo-card">
-            <img src="4.jpeg" alt="Osaka">
-            <div class="info">
-                <div class="num">#04</div>
-                <div class="desc">大阪生活的点滴</div>
-            </div>
-        </div>
-
-        <div class="photo-card offset-1">
-            <img src="5.jpeg" alt="Food">
-            <div class="info">
-                <div class="num">#05</div>
-                <div class="desc">便利店的美食诱惑</div>
-            </div>
-        </div>
-
-        <div class="photo-card">
-            <img src="6.jpeg" alt="Scenery">
-            <div class="info">
-                <div class="num">#06</div>
-                <div class="desc">电车上看到的晚霞</div>
-            </div>
-        </div>
-
-        <div class="photo-card offset-2">
-            <img src="7.jpeg" alt="Life">
-            <div class="info">
-                <div class="num">#07</div>
-                <div class="desc">街头的节日气氛</div>
-            </div>
-        </div>
-
-        <div class="photo-card">
-            <img src="8.jpeg" alt="Life">
-            <div class="info">
-                <div class="num">#08</div>
-                <div class="desc">奈良公园和🦌散步</div>
-            </div>
-        </div>
-
+    <div style="margin: 0 auto 25px auto; width: 100%; max-width: 400px; padding: 0 10px; box-sizing: border-box;">
+        <iframe style="border-radius:12px" src="http://googleusercontent.com/spotify.com/7" width="100%" height="152" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
     </div>
-<div id="lightbox" class="lightbox" onclick="this.style.display='none'">
+
+    <div class="container">
+        <div class="photo-card"><img src="1.jpeg"><div class="info"><div class="num">#01</div><div class="desc">我的黑猫奶油</div></div></div>
+        <div class="photo-card offset-1"><img src="2.jpeg"><div class="info"><div class="num">#02</div><div class="desc">社畜下班后的治愈时刻</div></div></div>
+        <div class="photo-card offset-2"><img src="3.jpeg"><div class="info"><div class="num">#03</div><div class="desc">可爱的跟玩偶一样的小狗</div></div></div>
+        <div class="photo-card"><img src="4.jpeg"><div class="info"><div class="num">#04</div><div class="desc">大阪生活的点滴</div></div></div>
+        <div class="photo-card offset-1"><img src="5.jpeg"><div class="info"><div class="num">#05</div><div class="desc">便利店的美食诱惑</div></div></div>
+        <div class="photo-card"><img src="6.jpeg"><div class="info"><div class="num">#06</div><div class="desc">电车上看到的晚霞</div></div></div>
+        <div class="photo-card offset-2"><img src="7.jpeg"><div class="info"><div class="num">#07</div><div class="desc">街头的节日气氛</div></div></div>
+        <div class="photo-card"><img src="8.jpeg"><div class="info"><div class="num">#08</div><div class="desc">奈良公园和🦌散步</div></div></div>
+    </div>
+
+    <div id="lightbox" class="lightbox" onclick="this.style.display='none'">
         <img id="lightbox-img" src="">
     </div>
 
@@ -167,7 +110,6 @@
         const lightboxImg = document.getElementById('lightbox-img');
 
         cards.forEach(img => {
-            img.style.cursor = 'zoom-in';
             img.onclick = function() {
                 lightbox.style.display = 'flex';
                 lightboxImg.src = this.src;
