@@ -14,6 +14,7 @@
             display: flex; flex-direction: column; align-items: center;
         }
 
+        /* 关于我卡片 */
         .about-card {
             background: white;
             border: 2px solid #333;
@@ -27,6 +28,7 @@
         .about-card h2 { margin-top: 0; font-size: 1.2rem; border-bottom: 2px solid #f0f4f0; padding-bottom: 5px; }
         .highlight { background: #333; color: white; padding: 0 5px; }
 
+        /* 出场按钮 */
         .reveal-btn {
             background: #ffcc00;
             color: #333;
@@ -35,7 +37,7 @@
             font-weight: bold;
             border-radius: 50px;
             cursor: pointer;
-            margin: 10px 0 30px 0;
+            margin: 20px 0 30px 0;
             box-shadow: 4px 4px 0px #333;
             transition: 0.2s;
             font-size: 1rem;
@@ -43,6 +45,7 @@
         .reveal-btn:hover { background: #ffe066; transform: scale(1.05); }
         .reveal-btn:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0px #333; }
 
+        /* 照片容器 */
         .container { 
             width: 100%; 
             max-width: 400px; 
@@ -51,12 +54,7 @@
             transform: translateY(30px);
             transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-
-        .container.show { 
-            display: block; 
-            opacity: 1;
-            transform: translateY(0);
-        }
+        .container.show { display: block; opacity: 1; transform: translateY(0); }
 
         .photo-card {
             display: flex;
@@ -70,13 +68,7 @@
             transition: 0.3s;
         }
         .photo-card:hover { transform: translateY(-3px); }
-
-        .photo-card img {
-            width: 90px; height: 90px;
-            object-fit: cover;
-            border-right: 2px solid #444;
-            cursor: zoom-in;
-        }
+        .photo-card img { width: 90px; height: 90px; object-fit: cover; border-right: 2px solid #444; cursor: zoom-in; }
 
         .info { padding: 10px 15px; flex-grow: 1; }
         .num { font-size: 0.8rem; color: #888; font-family: monospace; }
@@ -85,6 +77,7 @@
         .offset-1 { margin-left: 20px; background: #334455; }
         .offset-2 { margin-left: -10px; background: #443355; }
 
+        /* 大图层 */
         .lightbox {
             display: none;
             position: fixed;
@@ -96,11 +89,7 @@
             align-items: center;
             cursor: zoom-out;
         }
-        .lightbox img {
-            max-width: 90%;
-            max-height: 90%;
-            border-radius: 8px;
-        }
+        .lightbox img { max-width: 90%; max-height: 90%; border-radius: 8px; }
     </style>
 </head>
 <body>
@@ -111,14 +100,8 @@
         <p>记录一些碎碎念和生活碎片 ✨</p>
     </div>
 
-    <div style="margin: 0 auto 15px auto; width: 100%; max-width: 400px; padding: 0 10px; box-sizing: border-box; min-height: 152px;">
-        <iframe style="border-radius:12px" 
-            src="https://open.spotify.com/embed/track/2SST07p96j0jWw89Y65I2p" 
-            width="100%" height="152" 
-            frameBorder="0" allowfullscreen="" 
-            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
-            loading="lazy">
-        </iframe>
+    <div style="margin: 0 auto 20px auto; width: 100%; max-width: 400px; padding: 0 10px; box-sizing: border-box;">
+        <iframe data-testid="embed-iframe" style="border-radius:12px" src="https://open.spotify.com/embed/track/2YF2QvEFNGbIgNQaUzLk4Q?utm_source=generator" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
     </div>
 
     <button class="reveal-btn" id="show-photos">🐾 开启奶油的日常</button>
@@ -139,13 +122,14 @@
     </div>
 
     <script>
+        // 获取元素
         const cards = document.querySelectorAll('.photo-card img');
         const lightbox = document.getElementById('lightbox');
         const lightboxImg = document.getElementById('lightbox-img');
-        
         const showBtn = document.getElementById('show-photos');
         const container = document.getElementById('photo-container');
 
+        // 点击显示照片逻辑
         if(showBtn) {
             showBtn.onclick = function() {
                 container.style.display = 'block'; 
@@ -156,6 +140,7 @@
             };
         }
 
+        // 点击看大图逻辑
         cards.forEach(img => {
             img.onclick = function() {
                 lightbox.style.display = 'flex';
