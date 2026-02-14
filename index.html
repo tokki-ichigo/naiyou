@@ -6,82 +6,92 @@
     <title>Tokki的个人主页</title>
     <style>
         body {
-            background-color: #f0f4f0;
-            background-image: radial-gradient(#d1e0d1 1px, transparent 1px);
+            background-color: #f4f1ea; /* 更复古的纸张色 */
+            background-image: radial-gradient(#d1c7b7 1px, transparent 1px);
             background-size: 20px 20px;
             font-family: 'Segoe UI', "PingFang SC", sans-serif;
             margin: 0; padding: 20px;
             display: flex; flex-direction: column; align-items: center;
         }
 
-        /* 顶部关于我 */
+        /* 顶部卡片 */
         .about-card {
             background: white; border: 2px solid #333; padding: 20px;
             width: 85%; max-width: 350px; margin-bottom: 25px;
             box-shadow: 6px 6px 0px #333; border-radius: 4px;
             text-align: center; position: relative;
         }
-        .about-card::after {
-            content: '🐈‍⬛'; font-size: 35px; position: absolute;
-            top: -30px; right: -10px; transform: rotate(15deg);
-        }
 
         /* 🎵 音乐区域 */
-        .music-box {
-            width: 100%; max-width: 400px; margin-bottom: 20px;
-        }
+        .music-box { width: 100%; max-width: 400px; margin-bottom: 20px; }
 
-        /* 🐾 黑色猫爪按钮 */
-        .reveal-btn {
-            background: #1a1a1a; color: #ffcc00; border: 2px solid #000;
-            padding: 12px 28px; font-weight: bold; border-radius: 50px;
-            cursor: pointer; margin: 10px 0 30px 0;
-            box-shadow: 4px 4px 0px #666; transition: 0.2s;
-            display: flex; align-items: center; gap: 10px;
+        /* 🐾 悬浮猫爪按钮：不固定位置，随屏滚动 */
+        .floating-paw {
+            position: fixed; /* 核心：固定在屏幕上 */
+            bottom: 30px;
+            right: 30px;
+            width: 70px;
+            height: 70px;
+            background: #1a1a1a;
+            color: #ffcc00;
+            border-radius: 50%;
+            border: 3px solid #000;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+            z-index: 1000;
+            transition: transform 0.2s, background 0.3s;
+            user-select: none;
         }
-        .reveal-btn:active { transform: scale(0.95); box-shadow: 1px 1px 0px #000; }
+        .floating-paw:hover { transform: scale(1.1); background: #333; }
+        .floating-paw:active { transform: scale(0.9); }
+        .paw-text { font-size: 10px; font-weight: bold; margin-top: -5px; }
 
-        /* 📸 照片网格：实现一行两个 */
+        /* 📸 照片网格 */
         .photo-grid {
             display: flex; flex-wrap: wrap; justify-content: center;
-            gap: 12px; width: 100%; max-width: 500px; padding-bottom: 50px;
+            gap: 15px; width: 100%; max-width: 500px; padding-bottom: 100px;
         }
 
-        /* 拍立得样式卡片 */
+        /* 📸 复古拍立得卡片 */
         .polaroid {
-            display: none; /* 核心：初始隐藏 */
-            background: white; padding: 8px 8px 20px 8px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            width: calc(50% - 10px); /* 确保一行两个 */
-            box-sizing: border-box; flex-direction: column;
-            opacity: 0; transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: none; 
+            background: #fffdf5; /* 象牙白 */
+            padding: 10px 10px 25px 10px;
+            box-shadow: 3px 5px 15px rgba(0,0,0,0.15);
+            width: calc(50% - 10px);
+            box-sizing: border-box;
+            opacity: 0;
+            transition: all 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        /* 随性感旋转 */
-        .polaroid:nth-child(odd) { transform: rotate(-3deg) scale(0.8); }
-        .polaroid:nth-child(even) { transform: rotate(2deg) scale(0.8); }
-
-        /* 激活显示 */
-        .polaroid.active {
-            display: flex; opacity: 1;
+        /* 复古滤镜效果 */
+        .polaroid img {
+            width: 100%; aspect-ratio: 1 / 1; object-fit: cover;
+            filter: sepia(0.3) contrast(0.9) brightness(1.05); /* 核心：复古滤镜 */
+            border: 1px solid #ddd;
         }
+
+        /* 随性旋转 */
+        .polaroid:nth-child(odd) { transform: rotate(-4deg) scale(0.8); }
+        .polaroid:nth-child(even) { transform: rotate(3deg) scale(0.8); }
+
+        .polaroid.active { display: flex; opacity: 1; }
         .polaroid.active:nth-child(odd) { transform: rotate(-2deg) scale(1); }
         .polaroid.active:nth-child(even) { transform: rotate(1deg) scale(1); }
 
-        .polaroid img {
-            width: 100%; aspect-ratio: 1 / 1; object-fit: cover;
-            border: 1px solid #eee; cursor: zoom-in;
-        }
-
-        .polaroid-info { margin-top: 8px; text-align: center; font-size: 0.75rem; color: #444; }
+        .polaroid-info { margin-top: 10px; text-align: center; font-size: 0.75rem; color: #6e6352; font-style: italic; }
 
         /* 大图预览 */
         .lightbox {
-            display: none; position: fixed; z-index: 999;
+            display: none; position: fixed; z-index: 2000;
             top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0, 0, 0, 0.9); justify-content: center; align-items: center;
         }
-        .lightbox img { max-width: 90%; max-height: 90%; border: 5px solid white; }
+        .lightbox img { max-width: 90%; max-height: 90%; border: 10px solid white; box-shadow: 0 0 30px rgba(0,0,0,0.5); }
     </style>
 </head>
 <body>
@@ -96,19 +106,20 @@
         <iframe data-testid="embed-iframe" style="border-radius:12px" src="https://open.spotify.com/embed/track/2YF2QvEFNGbIgNQaUzLk4Q?utm_source=generator" width="100%" height="152" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
     </div>
 
-    <button class="reveal-btn" id="reveal-btn">
-        <span>🐾</span> 喂一张奶油的照片
-    </button>
+    <div class="floating-paw" id="reveal-btn">
+        <span style="font-size: 30px;">🐾</span>
+        <span class="paw-text">Feed</span>
+    </div>
 
-    <div class="photo-grid">
-        <div class="polaroid"><img src="1.jpeg"><div class="polaroid-info">我的黑猫奶油</div></div>
-        <div class="polaroid"><img src="2.jpeg"><div class="polaroid-info">下班治愈时刻</div></div>
-        <div class="polaroid"><img src="3.jpeg"><div class="polaroid-info">可爱的小狗</div></div>
-        <div class="polaroid"><img src="4.jpeg"><div class="polaroid-info">大阪生活点滴</div></div>
-        <div class="polaroid"><img src="5.jpeg"><div class="polaroid-info">便利店美食</div></div>
-        <div class="polaroid"><img src="6.jpeg"><div class="polaroid-info">电车晚霞</div></div>
-        <div class="polaroid"><img src="7.jpeg"><div class="polaroid-info">节日气氛</div></div>
-        <div class="polaroid"><img src="8.jpeg"><div class="polaroid-info">奈良的鹿🦌</div></div>
+    <div class="photo-grid" id="photo-grid">
+        <div class="polaroid"><img src="1.jpeg"><div class="polaroid-info">Naiyou #01</div></div>
+        <div class="polaroid"><img src="2.jpeg"><div class="polaroid-info">Naiyou #02</div></div>
+        <div class="polaroid"><img src="3.jpeg"><div class="polaroid-info">Naiyou #03</div></div>
+        <div class="polaroid"><img src="4.jpeg"><div class="polaroid-info">Naiyou #04</div></div>
+        <div class="polaroid"><img src="5.jpeg"><div class="polaroid-info">Naiyou #05</div></div>
+        <div class="polaroid"><img src="6.jpeg"><div class="polaroid-info">Naiyou #06</div></div>
+        <div class="polaroid"><img src="7.jpeg"><div class="polaroid-info">Naiyou #07</div></div>
+        <div class="polaroid"><img src="8.jpeg"><div class="polaroid-info">Naiyou #08</div></div>
     </div>
 
     <div id="lightbox" class="lightbox" onclick="this.style.display='none'">
@@ -120,23 +131,23 @@
         const cards = document.querySelectorAll('.polaroid');
         let index = 0;
 
-        // 点击逻辑：每点一次蹦出一张照片
         btn.addEventListener('click', () => {
             if (index < cards.length) {
                 const currentCard = cards[index];
                 currentCard.classList.add('active');
                 
-                // 手机端自动滚动
-                if(window.innerWidth < 500) {
-                    setTimeout(() => {
-                        currentCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    }, 100);
-                }
+                // 自动下滑逻辑：平滑滚动到当前展示的卡片
+                setTimeout(() => {
+                    currentCard.scrollIntoView({ 
+                        behavior: 'smooth', 
+                        block: 'center' 
+                    });
+                }, 100);
                 
                 index++;
                 if (index === cards.length) {
-                    btn.innerHTML = "✨ 照片全部掉落啦！";
-                    btn.style.opacity = "0.7";
+                    btn.querySelector('.paw-text').innerHTML = "Full!";
+                    btn.style.opacity = "0.5";
                 }
             }
         });
