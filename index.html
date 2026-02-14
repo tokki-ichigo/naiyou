@@ -14,7 +14,7 @@
             display: flex; flex-direction: column; align-items: center;
         }
 
-        /* 顶部卡片 */
+        /* 顶部关于我 */
         .about-card {
             background: white;
             border: 2px solid #333;
@@ -54,7 +54,7 @@
         }
         .reveal-btn:active { transform: scale(0.95); box-shadow: 1px 1px 0px #000; }
 
-        /* 照片网格 */
+        /* 📸 照片网格容器 */
         .photo-grid {
             display: flex;
             flex-wrap: wrap; 
@@ -62,22 +62,23 @@
             gap: 15px; 
             width: 100%;
             max-width: 500px;
+            padding-bottom: 50px;
         }
 
         /* 拍立得卡片样式 */
         .polaroid {
-            display: none; 
+            display: none; /* 初始隐藏 */
             background: white;
             padding: 10px 10px 25px 10px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            width: calc(50% - 15px); /* 一行两个的关键 */
+            width: calc(50% - 15px); /* 一行两个 */
             box-sizing: border-box;
             flex-direction: column;
             opacity: 0;
             transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        /* 随性倾斜感 */
+        /* 随性感：左右交替轻微倾斜 */
         .polaroid:nth-child(odd) { transform: rotate(-3deg) scale(0.8); }
         .polaroid:nth-child(even) { transform: rotate(2deg) scale(0.8); }
 
@@ -85,6 +86,7 @@
             display: flex;
             opacity: 1;
         }
+        /* 出现后保留微弱倾斜，模拟照片墙 */
         .polaroid.show:nth-child(odd) { transform: rotate(-2deg) scale(1); }
         .polaroid.show:nth-child(even) { transform: rotate(1deg) scale(1); }
 
@@ -93,6 +95,7 @@
             aspect-ratio: 1 / 1;
             object-fit: cover;
             border: 1px solid #eee;
+            cursor: zoom-in;
         }
 
         .polaroid-info {
@@ -102,7 +105,7 @@
             color: #444;
         }
 
-        /* 大图层 */
+        /* 大图预览层 */
         .lightbox {
             display: none; position: fixed; z-index: 999;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -128,4 +131,6 @@
     </button>
 
     <div class="photo-grid" id="photo-grid">
-        <div class="polaroid"><img
+        <div class="polaroid"><img src="1.jpeg"><div class="polaroid-info">我的黑猫奶油</div></div>
+        <div class="polaroid"><img src="2.jpeg"><div class="polaroid-info">下班治愈时刻</div></div>
+        <div class="polaroid"><img src="3.jpeg"><div class="polaroid
