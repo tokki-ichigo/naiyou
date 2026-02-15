@@ -9,13 +9,13 @@
         :root { --pixel-border: 2px solid #000; --bg-color: #f4f1ea; }
         body { background-color: var(--bg-color); background-image: radial-gradient(#d1c7b7 1px, transparent 1px); background-size: 20px 20px; font-family: 'Courier New', Courier, "PingFang SC", sans-serif; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
         
-        /* 🎵 音乐区域 - 现在它只是一个容器，等待嵌入代码 */
-        #music-container { width: 100%; max-width: 400px; margin-bottom: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        /* 🎵 音乐播放器容器 */
+        #music-container { width: 100%; max-width: 400px; min-height: 152px; margin-bottom: 20px; display: flex; align-items: center; justify-content: center; border-radius: 12px; }
 
-        /* 🗓️ 季节导航 */
+        /* 🗓️ 季节分类导航 */
         .season-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; width: 100%; max-width: 450px; margin-bottom: 25px; }
         .season-box { background: white; border: var(--pixel-border); padding: 8px; box-shadow: 4px 4px 0px #000; }
-        .season-title { font-size: 12px; font-weight: bold; margin-bottom: 5px; display: flex; align-items: center; gap: 5px; border-bottom: 1px dashed #ccc; padding-bottom: 3px; }
+        .season-title { font-size: 11px; font-weight: bold; margin-bottom: 5px; display: flex; align-items: center; gap: 5px; border-bottom: 1px dashed #ccc; padding-bottom: 3px; }
         .month-btns { display: flex; flex-wrap: wrap; gap: 5px; }
         .month-tab { background: #eee; border: 1px solid #333; padding: 3px 6px; cursor: pointer; font-size: 11px; font-weight: bold; }
         .month-tab.active { background: #ffcc00; transform: scale(1.1); box-shadow: 2px 2px 0px #000; }
@@ -44,14 +44,14 @@
         <div class="season-box" style="border-top:4px solid #add8e6"><div class="season-title">❄️ 冬季</div><div class="month-btns"><div class="month-tab" onclick="switchMonth('2026-12', this)">12</div><div class="month-tab" onclick="switchMonth('2026-01', this)">01</div><div class="month-tab active" onclick="switchMonth('2026-02', this)">02</div></div></div>
     </div>
 
-    <div class="photo-grid" id="photo-display"></div>
+    <div id="photo-display" class="photo-grid"></div>
 
     <div id="upload-panel">
-        <h3 style="margin-top:0;">🐾 嵌入新心情</h3>
-        <input type="text" id="img-url" placeholder="图片文件名 (如 7.jpeg)">
+        <h3 style="margin-top:0;">🐾 记录新瞬间</h3>
+        <input type="text" id="img-url" placeholder="图片名 (如 7.jpeg)">
         <textarea id="music-code" rows="4" placeholder="在此粘贴完整的 <iframe> 代码"></textarea>
         <input type="text" id="img-desc" placeholder="心情描述...">
-        <button onclick="saveEntry()" style="width:100%; background:#000; color:#fff; padding:12px; border:none; cursor:pointer; font-weight:bold;">确认发布</button>
+        <button onclick="saveEntry()" style="width:100%; background:#000; color:#fff; padding:12px; border:none; cursor:pointer; font-weight:bold;">发布</button>
         <button onclick="document.getElementById('upload-panel').style.display='none'" style="width:100%; background:none; border:none; color:#999; margin-top:10px;">取消</button>
     </div>
 
@@ -76,16 +76,16 @@
             container.innerHTML = '';
             
             if (data && data.length > 0) {
-                // 核心改动：直接插入数据库里的音乐代码
+                // 重点修复：使用 innerHTML 直接插入代码
                 const entryWithMusic = [...data].reverse().find(item => item.music_url && item.music_url.includes('<iframe'));
                 if (entryWithMusic) {
                     musicContainer.innerHTML = entryWithMusic.music_url;
                 } else {
-                    musicContainer.innerHTML = `<p style="font-size:11px; color:#999; border:1px dashed #ccc; padding:20px; border-radius:12px;">本月暂无嵌入音乐 🐾</p>`;
+                    musicContainer.innerHTML = `<p style="font-size:12px; color:#999; border:1px dashed #ccc; padding:20px; width:100%; text-align:center; border-radius:12px;">🎵 本月暂无嵌入音乐</p>`;
                 }
 
                 data.forEach(item => {
-                    // 过滤掉不含图片的错误数据
+                    // 过滤非图片数据
                     if (item.image_url && !item.image_url.includes('<iframe')) {
                         let finalImg = item.image_url.includes('http') ? item.image_url : './' + item.image_url;
                         container.innerHTML += `<div class="polaroid"><img src="${finalImg}"><div class="polaroid-info">${item.description || '🐾'}</div></div>`;
@@ -101,13 +101,10 @@
             const url = document.getElementById('img-url').value;
             const mCode = document.getElementById('music-code').value;
             const desc = document.getElementById('img-desc').value;
-            if (!url) return alert('图片不能空着哦！');
+            if (!url) return alert('图片链接必填哦！');
 
             const { error } = await supabaseClient.from('journal_entries').insert([{ 
-                image_url: url, 
-                music_url: mCode, // 这里存入的是整段 iframe 代码
-                description: desc, 
-                month: currentActiveMonth 
+                image_url: url, music_url: mCode, description: desc, month: currentActiveMonth 
             }]);
 
             if (!error) {
