@@ -8,34 +8,26 @@
     <style>
         :root { --pixel-border: 2px solid #000; --bg-color: #f4f1ea; }
         body { background-color: var(--bg-color); background-image: radial-gradient(#d1c7b7 1px, transparent 1px); background-size: 20px 20px; font-family: 'Courier New', Courier, "PingFang SC", sans-serif; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
-        
-        /* 🎵 音乐播放器容器 */
-        #music-container { width: 100%; max-width: 400px; min-height: 152px; margin-bottom: 20px; display: flex; align-items: center; justify-content: center; border-radius: 12px; }
-
-        /* 🗓️ 季节分类导航 */
+        #music-container { width: 100%; max-width: 400px; min-height: 152px; margin-bottom: 20px; display: flex; align-items: center; justify-content: center; }
         .season-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; width: 100%; max-width: 450px; margin-bottom: 25px; }
         .season-box { background: white; border: var(--pixel-border); padding: 8px; box-shadow: 4px 4px 0px #000; }
         .season-title { font-size: 11px; font-weight: bold; margin-bottom: 5px; display: flex; align-items: center; gap: 5px; border-bottom: 1px dashed #ccc; padding-bottom: 3px; }
         .month-btns { display: flex; flex-wrap: wrap; gap: 5px; }
         .month-tab { background: #eee; border: 1px solid #333; padding: 3px 6px; cursor: pointer; font-size: 11px; font-weight: bold; }
         .month-tab.active { background: #ffcc00; transform: scale(1.1); box-shadow: 2px 2px 0px #000; }
-
-        /* 📸 照片墙 */
         .photo-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; width: 100%; max-width: 500px; padding-bottom: 100px; }
         .polaroid { background: #fffdf5; border: var(--pixel-border); padding: 10px 10px 20px 10px; width: calc(50% - 10px); box-shadow: 4px 4px 10px rgba(0,0,0,0.1); display: flex; flex-direction: column; margin-bottom: 10px; }
         .polaroid img { width: 100%; border: var(--pixel-border); aspect-ratio: 1/1; object-fit: cover; }
         .polaroid-info { text-align: center; margin-top: 10px; font-size: 0.75rem; color: #444; border-top: 1px dashed #eee; padding-top: 5px; }
-
-        /* ✍️ 上传面板 */
         #upload-panel { display: none; background: white; border: var(--pixel-border); padding: 20px; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 2000; width: 85%; max-width: 350px; box-shadow: 10px 10px 0px #000; }
         textarea, input { width: 100%; margin-bottom: 12px; padding: 10px; border: 1px solid #ccc; box-sizing: border-box; font-family: inherit; }
         .floating-add { position: fixed; bottom: 30px; right: 30px; width: 65px; height: 65px; background: #1a1a1a; color: #ffcc00; border-radius: 50%; border: var(--pixel-border); display: flex; align-items: center; justify-content: center; font-size: 30px; cursor: pointer; z-index: 1000; }
+        button.primary-btn { width: 100%; background: #000; color: #fff; padding: 12px; border: none; cursor: pointer; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <div id="music-container">
-        </div>
+    <div id="music-container"></div>
 
     <div class="season-grid">
         <div class="season-box" style="border-top:4px solid #ffb7c5"><div class="season-title">🌸 春季</div><div class="month-btns"><div class="month-tab" onclick="switchMonth('2026-03', this)">03</div><div class="month-tab" onclick="switchMonth('2026-04', this)">04</div><div class="month-tab" onclick="switchMonth('2026-05', this)">05</div></div></div>
@@ -48,11 +40,12 @@
 
     <div id="upload-panel">
         <h3 style="margin-top:0;">🐾 记录新瞬间</h3>
-        <input type="text" id="img-url" placeholder="图片名 (如 7.jpeg)">
-        <textarea id="music-code" rows="4" placeholder="在此粘贴完整的 <iframe> 代码"></textarea>
-        <input type="text" id="img-desc" placeholder="心情描述...">
-        <button onclick="saveEntry()" style="width:100%; background:#000; color:#fff; padding:12px; border:none; cursor:pointer; font-weight:bold;">发布</button>
-        <button onclick="document.getElementById('upload-panel').style.display='none'" style="width:100%; background:none; border:none; color:#999; margin-top:10px;">取消</button>
+        <label style="font-size:12px; color:#666;">选择相册图片：</label>
+        <input type="file" id="file-input" accept="image/*">
+        <textarea id="music-code" rows="3" placeholder="在此粘贴完整的 <iframe> 代码"></textarea>
+        <input type="text" id="img-desc" placeholder="写点什么心情...">
+        <button id="submit-btn" class="primary-btn" onclick="handleUpload()">发布中...</button>
+        <button onclick="document.getElementById('upload-panel').style.display='none'" style="width:100%; background:none; border:none; color:#999; margin-top:10px; cursor:pointer;">取消</button>
     </div>
 
     <div class="floating-add" onclick="document.getElementById('upload-panel').style.display='block'">🐾</div>
@@ -66,52 +59,51 @@
         async function fetchEntries() {
             const container = document.getElementById('photo-display');
             const musicContainer = document.getElementById('music-container');
-            
-            const { data, error } = await supabaseClient
-                .from('journal_entries')
-                .select('*')
-                .eq('month', currentActiveMonth)
-                .order('created_at', { ascending: true });
-
+            const { data, error } = await supabaseClient.from('journal_entries').select('*').eq('month', currentActiveMonth).order('created_at', { ascending: true });
             container.innerHTML = '';
-            
             if (data && data.length > 0) {
-                // 重点修复：使用 innerHTML 直接插入代码
                 const entryWithMusic = [...data].reverse().find(item => item.music_url && item.music_url.includes('<iframe'));
-                if (entryWithMusic) {
-                    musicContainer.innerHTML = entryWithMusic.music_url;
-                } else {
-                    musicContainer.innerHTML = `<p style="font-size:12px; color:#999; border:1px dashed #ccc; padding:20px; width:100%; text-align:center; border-radius:12px;">🎵 本月暂无嵌入音乐</p>`;
-                }
-
+                musicContainer.innerHTML = entryWithMusic ? entryWithMusic.music_url : '<p style="font-size:12px; color:#999;">🎵 本月暂无音乐</p>';
                 data.forEach(item => {
-                    // 过滤非图片数据
-                    if (item.image_url && !item.image_url.includes('<iframe')) {
-                        let finalImg = item.image_url.includes('http') ? item.image_url : './' + item.image_url;
+                    if (item.image_url) {
+                        let finalImg = item.image_url.startsWith('http') ? item.image_url : './' + item.image_url;
                         container.innerHTML += `<div class="polaroid"><img src="${finalImg}"><div class="polaroid-info">${item.description || '🐾'}</div></div>`;
                     }
                 });
-            } else {
-                container.innerHTML = `<p style="color:#999; margin-top:50px">还没有记录呢 🐾</p>`;
-                musicContainer.innerHTML = '';
             }
         }
 
-        async function saveEntry() {
-            const url = document.getElementById('img-url').value;
+        async function handleUpload() {
+            const file = document.getElementById('file-input').files[0];
             const mCode = document.getElementById('music-code').value;
             const desc = document.getElementById('img-desc').value;
-            if (!url) return alert('图片链接必填哦！');
+            const btn = document.getElementById('submit-btn');
 
-            const { error } = await supabaseClient.from('journal_entries').insert([{ 
-                image_url: url, music_url: mCode, description: desc, month: currentActiveMonth 
+            if (!file) return alert('请先选择一张照片！');
+            btn.innerText = "正在上传中...";
+            btn.disabled = true;
+
+            // 1. 上传文件到 Storage
+            const fileName = `${Date.now()}_${file.name}`;
+            const { data: uploadData, error: uploadError } = await supabaseClient.storage.from('photos').upload(fileName, file);
+            
+            if (uploadError) return alert('上传失败：' + uploadError.message);
+
+            // 2. 获取图片公开链接
+            const { data: publicUrlData } = supabaseClient.storage.from('photos').getPublicUrl(fileName);
+            const publicUrl = publicUrlData.publicUrl;
+
+            // 3. 将链接和音乐存入数据库
+            const { error: dbError } = await supabaseClient.from('journal_entries').insert([{ 
+                image_url: publicUrl, music_url: mCode, description: desc, month: currentActiveMonth 
             }]);
 
-            if (!error) {
-                document.getElementById('upload-panel').style.display = 'none';
+            if (!dbError) {
                 location.reload();
             } else {
-                alert('保存失败，请检查数据库。');
+                alert('数据库存入失败：' + dbError.message);
+                btn.innerText = "确认发布";
+                btn.disabled = false;
             }
         }
 
@@ -122,6 +114,7 @@
             fetchEntries();
         }
 
+        document.getElementById('submit-btn').innerText = "确认发布";
         fetchEntries();
     </script>
 </body>
