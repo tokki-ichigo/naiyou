@@ -1,185 +1,44 @@
-<!DOCTYPE html>
-<html lang="zh">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tokki的像素季节手账 🐾</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <style>
-        :root { --pixel-border: 2px solid #000; --bg-color: #f4f1ea; }
-        body { background-color: var(--bg-color); background-image: radial-gradient(#d1c7b7 1px, transparent 1px); background-size: 20px 20px; font-family: 'Courier New', Courier, "PingFang SC", sans-serif; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+<script>
+    async function fetchEntries() {
+        const container = document.getElementById('photo-display');
+        const musicContainer = document.getElementById('music-container');
         
-        /* 🎵 音乐播放器 */
-        #music-container { width: 100%; max-width: 400px; min-height: 120px; margin-bottom: 20px; border-radius: 12px; overflow: hidden; background: rgba(255,255,255,0.5); display: flex; align-items: center; justify-content: center; border: var(--pixel-border); }
+        const { data, error } = await supabaseClient
+            .from('journal_entries')
+            .select('*')
+            .eq('month', currentActiveMonth)
+            .order('created_at', { ascending: true });
 
-        /* 🗓️ 季节分类导航 (多行排列) */
-        .season-grid {
-            display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;
-            width: 100%; max-width: 450px; margin-bottom: 25px;
-        }
-        .season-box {
-            background: white; border: var(--pixel-border); padding: 8px;
-            box-shadow: 4px 4px 0px #000;
-        }
-        .season-title { font-size: 12px; font-weight: bold; margin-bottom: 5px; display: flex; align-items: center; gap: 5px; border-bottom: 1px dashed #ccc; padding-bottom: 3px; }
-        .month-btns { display: flex; flex-wrap: wrap; gap: 5px; }
+        container.innerHTML = '';
         
-        .month-tab {
-            background: #eee; border: 1px solid #333; padding: 3px 6px;
-            cursor: pointer; font-size: 11px; font-weight: bold; transition: 0.2s;
-        }
-        .month-tab.active { background: #ffcc00; transform: scale(1.1); box-shadow: 2px 2px 0px #000; z-index: 10; }
-
-        /* 🌸 季节颜色微调 */
-        .spring { border-top: 4px solid #ffb7c5; } /* 樱粉 */
-        .summer { border-top: 4px solid #7eccad; } /* 绿意 */
-        .autumn { border-top: 4px solid #e9967a; } /* 枫叶 */
-        .winter { border-top: 4px solid #add8e6; } /* 冰雪 */
-
-        /* 📸 照片墙 */
-        .photo-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; width: 100%; max-width: 500px; padding-bottom: 100px; }
-        .polaroid { background: #fffdf5; border: var(--pixel-border); padding: 10px 10px 20px 10px; width: calc(50% - 10px); box-shadow: 4px 4px 10px rgba(0,0,0,0.1); display: flex; flex-direction: column; image-rendering: pixelated; }
-        .polaroid img { width: 100%; border: var(--pixel-border); aspect-ratio: 1/1; object-fit: cover; }
-        .polaroid-info { text-align: center; margin-top: 10px; font-size: 0.75rem; color: #444; border-top: 1px dashed #eee; padding-top: 5px; }
-
-        /* ✍️ 上传面板 */
-        #upload-panel { display: none; background: white; border: var(--pixel-border); padding: 20px; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 2000; width: 85%; max-width: 320px; box-shadow: 10px 10px 0px #000; }
-        input { width: 100%; margin-bottom: 12px; padding: 10px; border: 1px solid #ccc; box-sizing: border-box; font-family: inherit; }
-        .floating-add { position: fixed; bottom: 30px; right: 30px; width: 65px; height: 65px; background: #1a1a1a; color: #ffcc00; border-radius: 50%; border: var(--pixel-border); display: flex; align-items: center; justify-content: center; font-size: 30px; cursor: pointer; z-index: 1000; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
-        
-        button.primary-btn { width: 100%; background: #000; color: #fff; padding: 12px; border: none; cursor: pointer; font-weight: bold; }
-    </style>
-</head>
-<body>
-
-    <div id="music-container">
-        <p style="font-size: 11px; color: #666;">🎵 加载本月 BGM...</p>
-    </div>
-
-    <div class="season-grid">
-        <div class="season-box spring">
-            <div class="season-title">🌸 SPRING</div>
-            <div class="month-btns">
-                <div class="month-tab" onclick="switchMonth('2026-03', this)">03</div>
-                <div class="month-tab" onclick="switchMonth('2026-04', this)">04</div>
-                <div class="month-tab" onclick="switchMonth('2026-05', this)">05</div>
-            </div>
-        </div>
-        <div class="season-box summer">
-            <div class="season-title">🌿 SUMMER</div>
-            <div class="month-btns">
-                <div class="month-tab" onclick="switchMonth('2026-06', this)">06</div>
-                <div class="month-tab" onclick="switchMonth('2026-07', this)">07</div>
-                <div class="month-tab" onclick="switchMonth('2026-08', this)">08</div>
-            </div>
-        </div>
-        <div class="season-box autumn">
-            <div class="season-title">🍂 AUTUMN</div>
-            <div class="month-btns">
-                <div class="month-tab" onclick="switchMonth('2026-09', this)">09</div>
-                <div class="month-tab" onclick="switchMonth('2026-10', this)">10</div>
-                <div class="month-tab" onclick="switchMonth('2026-11', this)">11</div>
-            </div>
-        </div>
-        <div class="season-box winter">
-            <div class="season-title">❄️ WINTER</div>
-            <div class="month-btns">
-                <div class="month-tab" onclick="switchMonth('2026-12', this)">12</div>
-                <div class="month-tab" onclick="switchMonth('2026-01', this)">01</div>
-                <div class="month-tab active" onclick="switchMonth('2026-02', this)">02</div>
-            </div>
-        </div>
-    </div>
-
-    <div class="photo-grid" id="photo-display"></div>
-
-    <div id="upload-panel">
-        <h3 style="margin-top:0;">🐾 记录新瞬间</h3>
-        <p id="month-label" style="font-size:11px; color:#ff6600; font-weight:bold;"></p>
-        <input type="text" id="img-url" placeholder="图片链接">
-        <input type="text" id="music-url" placeholder="Spotify 嵌入链接">
-        <input type="text" id="img-desc" placeholder="心情描述...">
-        <button class="primary-btn" onclick="saveEntry()">发布</button>
-        <button onclick="document.getElementById('upload-panel').style.display='none'" style="width:100%; background:none; border:none; color:#999; margin-top:10px; cursor:pointer;">取消</button>
-    </div>
-
-    <div class="floating-add" onclick="openUpload()">🐾</div>
-
-    <script>
-        const SB_URL = 'https://cqnqeithtxwsribvkpdu.supabase.co';
-        const SB_KEY = 'sb_publishable_rAGZrZ7_xj5BukT4OJwrXA_f4bogSrm';
-        const supabaseClient = supabase.createClient(SB_URL, SB_KEY);
-
-        let currentActiveMonth = '2026-02';
-
-        async function fetchEntries() {
-            const container = document.getElementById('photo-display');
-            const musicContainer = document.getElementById('music-container');
-            container.innerHTML = '<p style="color:#999; margin-top:30px; font-size:12px">正在翻阅手账...</p>';
+        if (data && data.length > 0) {
+            // 找到该月最新的一条带链接的音乐记录
+            let latestMusic = [...data].reverse().find(item => item.music_url && item.music_url.trim() !== "");
             
-            const { data, error } = await supabaseClient
-                .from('journal_entries')
-                .select('*')
-                .eq('month', currentActiveMonth)
-                .order('created_at', { ascending: true });
-
-            container.innerHTML = '';
-            
-            if (data && data.length > 0) {
-                const entryWithMusic = [...data].reverse().find(item => item.music_url && item.music_url.includes('http'));
-                if (entryWithMusic) {
-                    musicContainer.innerHTML = `<iframe style="border-radius:12px" src="${entryWithMusic.music_url}" width="100%" height="152" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>`;
-                } else {
-                    musicContainer.innerHTML = `<p style="font-size:12px; color:#666;">🎵 该月暂无 BGM</p>`;
+            if (latestMusic) {
+                let mUrl = latestMusic.music_url;
+                // 自动修复链接格式：如果是普通链接，自动转为嵌入格式
+                if (mUrl.includes('open.spotify.com') && !mUrl.includes('/embed/')) {
+                    mUrl = mUrl.replace('open.spotify.com/', 'open.spotify.com/embed/');
                 }
+                musicContainer.innerHTML = `<iframe style="border-radius:12px" src="${mUrl}" width="100%" height="152" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>`;
+            } else {
+                musicContainer.innerHTML = `<p style="font-size:12px; color:#666;">🎵 这一月还没有 BGM 哦</p>`;
+            }
 
-                data.forEach(item => {
+            data.forEach(item => {
+                // 只有当 image_url 包含图片特征时才显示，防止之前的错误数据干扰
+                if (item.image_url && (item.image_url.includes('.') || item.image_url.length < 20)) {
                     container.innerHTML += `
                         <div class="polaroid">
-                            <img src="${item.image_url}" onerror="this.src='https://via.placeholder.com/150?text=Image+Error'">
+                            <img src="${item.image_url.includes('http') ? item.image_url : './' + item.image_url}" onerror="this.src='https://via.placeholder.com/150?text=Image+Error'">
                             <div class="polaroid-info">${item.description || '🐾'}</div>
                         </div>`;
-                });
-            } else {
-                container.innerHTML = `<p style="color:#999; margin-top:50px; font-size:12px">2026.${currentActiveMonth.split('-')[1]} 还没有记录 🐾</p>`;
-                musicContainer.innerHTML = `<p style="font-size:11px; color:#999;">等待音乐响起...</p>`;
-            }
+                }
+            });
+        } else {
+            container.innerHTML = `<p style="color:#999; margin-top:50px">还没有记录呢 🐾</p>`;
+            musicContainer.innerHTML = `<p style="font-size:11px; color:#999;">等待音乐响起...</p>`;
         }
-
-        function openUpload() {
-            document.getElementById('month-label').innerText = `当前记录：${currentActiveMonth}`;
-            document.getElementById('upload-panel').style.display = 'block';
-        }
-
-        async function saveEntry() {
-            const url = document.getElementById('img-url').value;
-            const mUrl = document.getElementById('music-url').value;
-            const desc = document.getElementById('img-desc').value;
-            if (!url) return alert('图片链接必填哦！');
-
-            const { error } = await supabaseClient.from('journal_entries').insert([{ 
-                image_url: url, 
-                music_url: mUrl, 
-                description: desc, 
-                month: currentActiveMonth 
-            }]);
-
-            if (!error) {
-                document.getElementById('upload-panel').style.display = 'none';
-                fetchEntries();
-            } else {
-                alert('保存失败，请检查数据库设置。');
-            }
-        }
-
-        function switchMonth(month, el) {
-            currentActiveMonth = month;
-            document.querySelectorAll('.month-tab').forEach(t => t.classList.remove('active'));
-            el.classList.add('active');
-            fetchEntries();
-        }
-
-        fetchEntries();
-    </script>
-</body>
-</html>
+    }
+</script>
