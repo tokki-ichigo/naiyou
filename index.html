@@ -3,7 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🍓的像素季节手账 🐾</title>
+    <title>🍓的生活记录 🐾</title>
+    
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/1077/1077114.png">
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root { 
@@ -14,11 +20,24 @@
             --autumn-bg: #fff5eb; --autumn-accent: #e9967a;
             --winter-bg: #f0f8ff; --winter-accent: #add8e6;
         }
-        body { background-color: var(--bg-color); background-image: radial-gradient(#d1c7b7 1px, transparent 1px); background-size: 20px 20px; font-family: 'Courier New', Courier, "PingFang SC", sans-serif; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
         
+        /* ✨ 新增：可爱像素风背景图层 */
+        body { 
+            background-color: var(--bg-color); 
+            /* 使用刚才为你生成的像素背景图 */
+            background-image: url('https://img.freepik.com/free-vector/pixel-art-sky-background_23-2148532958.jpg?size=626&ext=jpg');
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+            font-family: 'Courier New', Courier, "PingFang SC", sans-serif; 
+            margin: 0; padding: 20px; 
+            display: flex; flex-direction: column; align-items: center; 
+            min-height: 100vh; 
+        }
+
         /* 📱 启动大厅 */
         .app-hall { display: none; width: 100%; max-width: 450px; padding-bottom: 50px; }
-        .season-card { background: white; border: var(--pixel-border); padding: 18px; margin-bottom: 25px; box-shadow: 6px 6px 0px #000; position: relative; }
+        .season-card { background: rgba(255, 255, 255, 0.9); border: var(--pixel-border); padding: 18px; margin-bottom: 25px; box-shadow: 6px 6px 0px #000; position: relative; backdrop-filter: blur(5px); }
         .season-header { font-size: 20px; font-weight: bold; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; border-bottom: 2px dashed #000; padding-bottom: 8px; }
         .month-grid { display: flex; gap: 12px; flex-wrap: wrap; }
         .month-btn { background: #fff; border: var(--pixel-border); padding: 12px 20px; cursor: pointer; font-weight: bold; font-size: 18px; box-shadow: 3px 3px 0px #000; }
@@ -26,8 +45,8 @@
 
         /* 📸 详情页 */
         .detail-page { display: none; width: 100%; max-width: 500px; }
-        .nav-bar { width: 100%; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        #music-container { width: 100%; margin-bottom: 20px; min-height: 152px; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.03); border-radius: 12px; }
+        .nav-bar { width: 100%; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: rgba(255,255,255,0.8); padding: 10px; border: var(--pixel-border); }
+        #music-container { width: 100%; margin-bottom: 20px; min-height: 152px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.8); border: var(--pixel-border); }
         .photo-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; padding-bottom: 100px; }
         .polaroid { background: #fffdf5; border: var(--pixel-border); padding: 10px 10px 20px 10px; position: relative; box-shadow: 4px 4px 10px rgba(0,0,0,0.1); display: flex; flex-direction: column; }
         .polaroid img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border: var(--pixel-border); }
@@ -40,14 +59,14 @@
         .emoji-selector { display: flex; justify-content: space-between; margin-bottom: 15px; font-size: 24px; background: #f9f9f9; padding: 10px; border: 1px dashed #ccc; }
         .emoji-item { cursor: pointer; transition: 0.2s; }
 
-        .floating-add { position: fixed; bottom: 30px; right: 30px; width: 65px; height: 65px; background: #1a1a1a; color: #ffcc00; border-radius: 50%; border: var(--pixel-border); display: flex; align-items: center; justify-content: center; font-size: 30px; cursor: pointer; z-index: 1000; }
+        .floating-add { position: fixed; bottom: 30px; right: 30px; width: 65px; height: 65px; background: #1a1a1a; color: #ffcc00; border-radius: 50%; border: var(--pixel-border); display: flex; align-items: center; justify-content: center; font-size: 30px; cursor: pointer; z-index: 1000; box-shadow: 4px 4px 0px #000; }
     </style>
 </head>
 <body>
 
     <div id="app-hall" class="app-hall">
-        <h1 style="text-align:center; font-size:26px; margin: 20px 0 40px 0;">🍓的生活记录</h1>
-        <div class="season-card" style="background: var(--spring-bg); border-top: 8px solid var(--spring-accent);">
+        <h1 style="text-align:center; font-size:26px; margin: 20px 0 40px 0; color: #000; text-shadow: 2px 2px #fff;">🍓的生活记录</h1>
+        <div class="season-card" style="border-top: 8px solid var(--spring-accent);">
             <div class="season-header">🌸 春季 Spring</div>
             <div class="month-grid">
                 <button class="month-btn" onclick="goToMonth('03')">03</button>
@@ -55,7 +74,7 @@
                 <button class="month-btn" onclick="goToMonth('05')">05</button>
             </div>
         </div>
-        <div class="season-card" style="background: var(--summer-bg); border-top: 8px solid var(--summer-accent);">
+        <div class="season-card" style="border-top: 8px solid var(--summer-accent);">
             <div class="season-header">🌿 夏季 Summer</div>
             <div class="month-grid">
                 <button class="month-btn" onclick="goToMonth('06')">06</button>
@@ -63,7 +82,7 @@
                 <button class="month-btn" onclick="goToMonth('08')">08</button>
             </div>
         </div>
-        <div class="season-card" style="background: var(--autumn-bg); border-top: 8px solid var(--autumn-accent);">
+        <div class="season-card" style="border-top: 8px solid var(--autumn-accent);">
             <div class="season-header">🍂 秋季 Autumn</div>
             <div class="month-grid">
                 <button class="month-btn" onclick="goToMonth('09')">09</button>
@@ -71,7 +90,7 @@
                 <button class="month-btn" onclick="goToMonth('11')">11</button>
             </div>
         </div>
-        <div class="season-card" style="background: var(--winter-bg); border-top: 8px solid var(--winter-accent);">
+        <div class="season-card" style="border-top: 8px solid var(--winter-accent);">
             <div class="season-header">❄️ 冬季 Winter</div>
             <div class="month-grid">
                 <button class="month-btn" onclick="goToMonth('12')">12</button>
@@ -169,13 +188,9 @@
             
             if (!file) return alert('选张照片吧！');
 
-            // ✨ 强化版 Spotify 转换逻辑
             if (mInput && mInput.includes('spotify.com') && !mInput.includes('<iframe')) {
-                // 1. 提取纯净链接（去掉 ?si= 等参数）
                 let cleanUrl = mInput.split('?')[0];
-                // 2. 将普通播放链接转换为嵌入式链接
-                let embedUrl = cleanUrl.replace('spotify.com/', 'spotify.com/embed/');
-                // 3. 生成完整的 iframe 代码
+                let embedUrl = cleanUrl.replace('/track/', '/embed/track/').replace('/album/', '/embed/album/');
                 mInput = `<iframe src="${embedUrl}" width="100%" height="152" frameBorder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>`;
             }
 
