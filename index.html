@@ -93,7 +93,7 @@
     <div id="upload-panel">
         <h3 style="margin-top:0;">发布新瞬间 🐾</h3>
         <input type="file" id="file-input" accept="image/*">
-        <textarea id="music-code" rows="3" placeholder="在此粘贴 Spotify iframe 代码"></textarea>
+        <textarea id="music-code" rows="3" placeholder="在此粘贴 Spotify 链接或 iframe 代码"></textarea>
         <input type="text" id="img-desc" placeholder="写点心情...">
         <button id="submit-btn" style="width:100%; background:#000; color:#fff; padding:12px; border:none; cursor:pointer; font-weight:bold;" onclick="handleUpload()">确认发布</button>
         <button onclick="document.getElementById('upload-panel').style.display='none'" style="width:100%; background:none; border:none; color:#999; margin-top:10px;">取消</button>
@@ -153,24 +153,42 @@
 
         async function handleUpload() {
             const file = document.getElementById('file-input').files[0];
-            const mCode = document.getElementById('music-code').value;
+            let mInput = document.getElementById('music-code').value.trim();
             const desc = document.getElementById('img-desc').value;
+            
             if (!file) return alert('选张照片吧！');
+
+            // ✨ 自动转换 Spotify 链接为 iframe 代码
+            if (mInput && mInput.includes('spotify.com') && !mInput.includes('<iframe')) {
+                const url = mInput.split('?')[0]; // 去掉多余参数
+                const embedUrl = url.replace('spotify.com/', 'spotify.com/embed/');
+                mInput = `<iframe src="${embedUrl}" width="100%" height="152" frameBorder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>`;
+            }
 
             const btn = document.getElementById('submit-btn');
             btn.innerText = "正在发布...";
             btn.disabled = true;
 
-            const fileName = `${Date.now()}_${file.name}`;
-            const { error: upErr } = await supabaseClient.storage.from('photos').upload(fileName, file);
-            if (upErr) return alert('图片上传失败');
+            try {
+                const fileName = `${Date.now()}_${file.name}`;
+                const { error: upErr } = await supabaseClient.storage.from('photos').upload(fileName, file);
+                if (upErr) throw upErr;
 
-            const { data: pUrl } = supabaseClient.storage.from('photos').getPublicUrl(fileName);
-            await supabaseClient.from('journal_entries').insert([{ 
-                image_url: pUrl.publicUrl, music_url: mCode, description: desc, month: `2026-${activeMonth}` 
-            }]);
+                const { data: pUrl } = supabaseClient.storage.from('photos').getPublicUrl(fileName);
+                const { error: dbErr } = await supabaseClient.from('journal_entries').insert([{ 
+                    image_url: pUrl.publicUrl, 
+                    music_url: mInput, 
+                    description: desc, 
+                    month: `2026-${activeMonth}` 
+                }]);
 
-            location.reload();
+                if (dbErr) throw dbErr;
+                location.reload();
+            } catch (err) {
+                alert('发布失败：' + err.message);
+                btn.innerText = "确认发布";
+                btn.disabled = false;
+            }
         }
     </script>
 </body>
