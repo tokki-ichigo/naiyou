@@ -1,6 +1,5 @@
-// ocr.js 
+// ocr.js - 商品明细+金额增强识别版
 async function performOCR(base64Image) {
-    console.log("OCR 启动：正在发送图片到 Google...");
     const API_KEY = 'AIzaSyAOEcowPZGMeeq-ttQ2Iad5aWDoUqicEmk'; 
     const url = `https://vision.googleapis.com/v1/images:annotate?key=${API_KEY}`;
 
@@ -20,38 +19,47 @@ async function performOCR(base64Image) {
         });
         
         const data = await response.json();
-        if (data.error) {
-            console.error("API 报错:", data.error.message);
-            return null;
-        }
+        if (!data.responses || !data.responses[0].fullTextAnnotation) return null;
         
         const fullText = data.responses[0].fullTextAnnotation.text;
-        
-        // 自动填写描述
+        const lines = fullText.split('\n');
+
+        // --- 商品名与金额识别逻辑 ---
+        let items = [];
+        let totalAmount = null;
+        const jpTotalKeywords = ['合計', '合計金額', 'お支払い', '税込'];
+        const amountRegex = /([\d,]+)円?$/; // 匹配行尾的数字（可能带“円”）
+
+        lines.forEach(line => {
+            // 1. 寻找总额 (排除掉包含年份 2026 的行)
+            if (!line.includes('202') && !line.includes('年')) {
+                jpTotalKeywords.forEach(kw => {
+                    if (line.includes(kw)) {
+                        const match = line.match(/([\d,]+)/);
+                        if (match) totalAmount = parseFloat(match[0].replace(/,/g, ''));
+                    }
+                });
+            }
+
+            // 2. 识别商品明细 (通常包含数字且不含“合计”等字样)
+            const amountMatch = line.match(/[\d,]+$/);
+            if (amountMatch && !jpTotalKeywords.some(kw => line.includes(kw)) && !line.includes('年') && line.length > 5) {
+                // 剔除掉只有数字的干扰行
+                items.push(line.trim());
+            }
+        });
+
+        // 3. 自动填写描述框 (ID: img-desc)
         const descInput = document.getElementById('img-desc');
         if (descInput) {
-            descInput.value = fullText.substring(0, 50).replace(/\n/g, ' ') + "...";
+            // 将识别到的前几项商品组合在一起
+            const itemListStr = items.slice(0, 3).join(' | '); 
+            descInput.value = itemListStr ? `🛒 ${itemListStr}` : "记录生活点滴... 🐾";
         }
 
-        // 提取金额逻辑 (适配全家小票)
-        const lines = fullText.split('\n');
-        const jpKeywords = ['合計', '合計金額', 'お支払い', '税込', '小計'];
-        const numberRegex = /([\d,]+)/;
-
-        for (let line of lines) {
-            if (line.includes('202') || line.includes('年')) continue;
-            for (let kw of jpKeywords) {
-                if (line.includes(kw)) {
-                    const match = line.match(numberRegex);
-                    if (match) {
-                        return parseFloat(match[0].replace(/,/g, ''));
-                    }
-                }
-            }
-        }
-        return null;
+        return totalAmount;
     } catch (error) {
-        console.error("OCR 请求失败:", error);
+        console.error("OCR 识别出错:", error);
         return null;
     }
 }
