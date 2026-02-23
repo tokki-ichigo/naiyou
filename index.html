@@ -3,214 +3,80 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🍓的生活记录 🐾</title>
-    
+    <title>🍓 像素时光生活轴</title>
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/1077/1077114.png">
-
+    <link rel="apple-touch-icon" href="icon.jpg">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        :root { 
-            --pixel-border: 2px solid #000; 
-            --bg-color: #f4f1ea;
-            --spring-bg: #fff0f3; --spring-accent: #ffb7c5;
-            --summer-bg: #f0fff4; --summer-accent: #7eccad;
-            --autumn-bg: #fff5eb; --autumn-accent: #e9967a;
-            --winter-bg: #f0f8ff; --winter-accent: #add8e6;
-        }
-        
-        /* ✨ 恢复最初干净的像素格子背景 */
-        body { 
-            background-color: var(--bg-color); 
-            background-image: radial-gradient(#d1c7b7 1px, transparent 1px);
-            background-size: 20px 20px;
-            font-family: 'Courier New', Courier, "PingFang SC", sans-serif; 
-            margin: 0; padding: 20px; 
-            display: flex; flex-direction: column; align-items: center; 
-            min-height: 100vh; 
-        }
-
-        /* 📱 启动大厅 */
-        .app-hall { display: none; width: 100%; max-width: 450px; padding-bottom: 50px; }
-        .season-card { background: white; border: var(--pixel-border); padding: 18px; margin-bottom: 25px; box-shadow: 6px 6px 0px #000; position: relative; }
-        .season-header { font-size: 20px; font-weight: bold; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; border-bottom: 2px dashed #000; padding-bottom: 8px; }
-        .month-grid { display: flex; gap: 12px; flex-wrap: wrap; }
-        .month-btn { background: #fff; border: var(--pixel-border); padding: 12px 20px; cursor: pointer; font-weight: bold; font-size: 18px; box-shadow: 3px 3px 0px #000; }
-        .month-btn:active { transform: translate(2px, 2px); box-shadow: none; }
-
-        /* 📸 详情页 */
-        .detail-page { display: none; width: 100%; max-width: 500px; }
-        .nav-bar { width: 100%; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        #music-container { width: 100%; margin-bottom: 20px; min-height: 152px; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.03); border-radius: 12px; }
-        .photo-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; padding-bottom: 100px; }
-        .polaroid { background: #fffdf5; border: var(--pixel-border); padding: 10px 10px 20px 10px; position: relative; box-shadow: 4px 4px 10px rgba(0,0,0,0.1); display: flex; flex-direction: column; }
-        .polaroid img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border: var(--pixel-border); }
-        .delete-btn { position: absolute; top: -8px; right: -8px; width: 26px; height: 26px; background: #ff4444; color: white; border: 2px solid #000; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-weight: bold; z-index: 10; box-shadow: 2px 2px 0px #000; }
-
-        /* ✍️ 发布面板 */
-        #upload-panel { display: none; background: white; border: var(--pixel-border); padding: 25px; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 2000; width: 85%; max-width: 350px; box-shadow: 10px 10px 0px #000; }
-        input, textarea { width: 100%; margin-bottom: 15px; padding: 12px; border: 1px solid #ccc; box-sizing: border-box; font-family: inherit; }
-        
-        .emoji-selector { display: flex; justify-content: space-between; margin-bottom: 15px; font-size: 24px; background: #f9f9f9; padding: 10px; border: 1px dashed #ccc; }
-        .emoji-item { cursor: pointer; transition: 0.2s; }
-
-        .floating-add { position: fixed; bottom: 30px; right: 30px; width: 65px; height: 65px; background: #1a1a1a; color: #ffcc00; border-radius: 50%; border: var(--pixel-border); display: flex; align-items: center; justify-content: center; font-size: 30px; cursor: pointer; z-index: 1000; box-shadow: 4px 4px 0px #000; }
+        :root { --p-border: 2px solid #000; --bg: #f4f1ea; }
+        body { background: var(--bg); background-image: radial-gradient(#d1c7b7 1px, transparent 1px); background-size: 20px 20px; font-family: "PingFang SC", sans-serif; margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
+        .stats-card { background: #fff; border: var(--p-border); padding: 15px; width: 100%; max-width: 400px; box-shadow: 4px 4px 0 #000; margin-bottom: 20px; text-align: center; }
+        .timeline { width: 100%; max-width: 400px; display: flex; flex-direction: column; gap: 20px; padding-bottom: 100px; }
+        .day-card { background: #fff; border: var(--p-border); padding: 15px; box-shadow: 6px 6px 0 #000; position: relative; }
+        .date-tag { background: #000; color: #fff; padding: 2px 8px; font-size: 12px; margin-bottom: 10px; display: inline-block; }
+        .price-tag { float: right; color: #ff4757; font-weight: bold; }
+        .entry-img { width: 100%; border: var(--p-border); aspect-ratio: 1/1; object-fit: cover; }
+        .floating-add { position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; background: #000; color: #ffcc00; border-radius: 50%; border: var(--p-border); display: flex; align-items: center; justify-content: center; font-size: 30px; cursor: pointer; z-index: 1000; box-shadow: 4px 4px 0 #000; }
+        #upload-panel { display: none; background: white; border: var(--p-border); padding: 20px; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 2000; width: 85%; max-width: 320px; box-shadow: 10px 10px 0 #000; }
+        input { width: 100%; margin-bottom: 10px; padding: 12px; border: 1px solid #ccc; font-family: inherit; }
     </style>
-</head> 
-
+</head>
 <body>
 
-    <div id="app-hall" class="app-hall">
-        <h1 style="text-align:center; font-size:26px; margin: 20px 0 40px 0;">🍓的生活记录</h1>
-        <div class="season-card" style="border-top: 8px solid var(--spring-accent);">
-            <div class="season-header">🌸 春季 Spring</div>
-            <div class="month-grid">
-                <button class="month-btn" onclick="goToMonth('03')">03</button>
-                <button class="month-btn" onclick="goToMonth('04')">04</button>
-                <button class="month-btn" onclick="goToMonth('05')">05</button>
-            </div>
-        </div>
-        <div class="season-card" style="border-top: 8px solid var(--summer-accent);">
-            <div class="season-header">🌿 夏季 Summer</div>
-            <div class="month-grid">
-                <button class="month-btn" onclick="goToMonth('06')">06</button>
-                <button class="month-btn" onclick="goToMonth('07')">07</button>
-                <button class="month-btn" onclick="goToMonth('08')">08</button>
-            </div>
-        </div>
-        <div class="season-card" style="border-top: 8px solid var(--autumn-accent);">
-            <div class="season-header">🍂 秋季 Autumn</div>
-            <div class="month-grid">
-                <button class="month-btn" onclick="goToMonth('09')">09</button>
-                <button class="month-btn" onclick="goToMonth('10')">10</button>
-                <button class="month-btn" onclick="goToMonth('11')">11</button>
-            </div>
-        </div>
-        <div class="season-card" style="border-top: 8px solid var(--winter-accent);">
-            <div class="season-header">❄️ 冬季 Winter</div>
-            <div class="month-grid">
-                <button class="month-btn" onclick="goToMonth('12')">12</button>
-                <button class="month-btn" onclick="goToMonth('01')">01</button>
-                <button class="month-btn" onclick="goToMonth('02')">02</button>
-            </div>
-        </div>
+    <div class="stats-card">
+        <h2 style="margin:0; font-size:20px;">🍓 我的时光轴</h2>
+        <div id="total-amount" style="font-size:14px; color:#666; margin-top:5px;">本月支出：¥ 0.00</div>
     </div>
 
-    <div id="detail-page" class="detail-page">
-        <div class="nav-bar">
-            <h2 id="page-title" style="margin:0;">2026.02</h2>
-            <button onclick="location.href='index.html'" style="background:#000; color:#fff; border:none; padding:8px 15px; cursor:pointer; font-weight:bold;">🏠 返回</button>
-        </div>
-        <div id="music-container"></div>
-        <div id="photo-display" class="photo-list"></div>
-    </div>
+    <div id="timeline" class="timeline"></div>
 
     <div id="upload-panel">
-        <h3 style="margin-top:0;">发布新瞬间 🐾</h3>
-        <div class="emoji-selector">
-            <span class="emoji-item" onclick="addEmoji('🍓')">🍓</span>
-            <span class="emoji-item" onclick="addEmoji('🎀')">🎀</span>
-            <span class="emoji-item" onclick="addEmoji('🧸')">🧸</span>
-            <span class="emoji-item" onclick="addEmoji('🍰')">🍰</span>
-            <span class="emoji-item" onclick="addEmoji('🌟')">🌟</span>
-        </div>
-        <input type="file" id="file-input" accept="image/*">
-        <textarea id="music-code" rows="2" placeholder="直接粘贴 Spotify 歌曲链接"></textarea>
-        <input type="text" id="img-desc" placeholder="写点心情...">
-        <button id="submit-btn" style="width:100%; background:#000; color:#fff; padding:12px; border:none; cursor:pointer; font-weight:bold;" onclick="handleUpload()">确认发布</button>
+        <h3 style="margin-top:0;">存入瞬间 🐾</h3>
+        <input type="number" id="amt" placeholder="花掉了多少钱？(可选)">
+        <input type="text" id="desc" placeholder="写点心情...">
+        <input type="file" id="file" accept="image/*">
+        <button id="btn" style="width:100%; background:#000; color:#fff; padding:12px; border:none; cursor:pointer; font-weight:bold;" onclick="upload()">确认发布</button>
         <button onclick="document.getElementById('upload-panel').style.display='none'" style="width:100%; background:none; border:none; color:#999; margin-top:10px;">取消</button>
     </div>
 
-    <div class="floating-add" id="add-trigger" onclick="document.getElementById('upload-panel').style.display='block'">🐾</div>
+    <div class="floating-add" onclick="document.getElementById('upload-panel').style.display='block'">+</div>
 
     <script>
         const SB_URL = 'https://cqnqeithtxwsribvkpdu.supabase.co';
         const SB_KEY = 'sb_publishable_rAGZrZ7_xj5BukT4OJwrXA_f4bogSrm';
-        const supabaseClient = supabase.createClient(SB_URL, SB_KEY);
+        const client = supabase.createClient(SB_URL, SB_KEY);
 
-        const urlParams = new URLSearchParams(window.location.search);
-        const activeMonth = urlParams.get('month');
-
-        if (activeMonth) {
-            document.getElementById('detail-page').style.display = 'block';
-            document.getElementById('page-title').innerText = `2026.${activeMonth} 🐾`;
-            fetchEntries();
-        } else {
-            document.getElementById('app-hall').style.display = 'block';
-            document.getElementById('add-trigger').style.display = 'none';
-        }
-
-        function goToMonth(m) { location.href = `index.html?month=${m}`; }
-        function addEmoji(emoji) {
-            const descInput = document.getElementById('img-desc');
-            descInput.value = emoji + " " + descInput.value;
-        }
-
-        async function fetchEntries() {
-            const container = document.getElementById('photo-display');
-            const musicContainer = document.getElementById('music-container');
-            const { data } = await supabaseClient.from('journal_entries').select('*').eq('month', `2026-${activeMonth}`).order('created_at', { ascending: false });
-            
-            container.innerHTML = '';
-            if (data && data.length > 0) {
-                const entryWithMusic = data.find(item => item.music_url && item.music_url.includes('<iframe'));
-                musicContainer.innerHTML = entryWithMusic ? entryWithMusic.music_url : '<p style="font-size:12px; color:#999;">🎵 本月暂无音乐</p>';
-                data.forEach(item => {
-                    if (item.image_url) {
-                        container.innerHTML += `
-                            <div class="polaroid">
-                                <div class="delete-btn" onclick="deleteEntry(${item.id})">×</div>
-                                <img src="${item.image_url}">
-                                <div style="text-align:center; font-size:12px; margin-top:10px; color:#555;">${item.description || '🐾'}</div>
-                            </div>`;
-                    }
+        async function load() {
+            const { data } = await client.from('journal_entries').select('*').order('created_at', { ascending: false });
+            const list = document.getElementById('timeline');
+            let total = 0; list.innerHTML = '';
+            if (data) {
+                data.forEach(i => {
+                    const d = new Date(i.created_at);
+                    const ds = `${d.getFullYear()}.${d.getMonth()+1}.${d.getDate()}`;
+                    if (i.amount) total += parseFloat(i.amount);
+                    list.innerHTML += `<div class="day-card"><span class="date-tag">${ds}</span>${i.amount ? `<span class="price-tag">¥${i.amount}</span>` : ''}<img class="entry-img" src="${i.image_url}"><div style="margin-top:10px; font-size:14px;">${i.description || ''}</div></div>`;
                 });
-            } else {
-                container.innerHTML = '<p style="color:#999; text-align:center; grid-column: 1/-1; margin-top:100px;">这里还没有瞬间呢 🐾</p>';
-                musicContainer.innerHTML = '';
+                document.getElementById('total-amount').innerText = `本月支出：¥ ${total.toFixed(2)}`;
             }
         }
 
-        async function deleteEntry(id) {
-            if (!confirm('确定要删除这条回忆吗？')) return;
-            await supabaseClient.from('journal_entries').delete().eq('id', id);
-            fetchEntries();
-        }
-
-        async function handleUpload() {
-            const file = document.getElementById('file-input').files[0];
-            let mInput = document.getElementById('music-code').value.trim();
-            const desc = document.getElementById('img-desc').value;
-            
-            if (!file) return alert('选张照片吧！');
-
-            if (mInput && mInput.includes('spotify.com') && !mInput.includes('<iframe')) {
-                let cleanUrl = mInput.split('?')[0];
-                let embedUrl = cleanUrl.replace('/track/', '/embed/track/').replace('/album/', '/embed/album/');
-                mInput = `<iframe src="${embedUrl}" width="100%" height="152" frameBorder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>`;
-            }
-
-            const btn = document.getElementById('submit-btn');
-            btn.innerText = "正在发布...";
-            btn.disabled = true;
-
+        async function upload() {
+            const f = document.getElementById('file').files[0];
+            const a = document.getElementById('amt').value;
+            const d = document.getElementById('desc').value;
+            if (!f) return alert('拍张照记录今天吧！');
+            const b = document.getElementById('btn'); b.innerText = "同步中..."; b.disabled = true;
             try {
-                const fileName = `${Date.now()}_${file.name}`;
-                const { error: upErr } = await supabaseClient.storage.from('photos').upload(fileName, file);
-                if (upErr) throw upErr;
-                const { data: pUrl } = supabaseClient.storage.from('photos').getPublicUrl(fileName);
-                await supabaseClient.from('journal_entries').insert([{ 
-                    image_url: pUrl.publicUrl, music_url: mInput, description: desc, month: `2026-${activeMonth}` 
-                }]);
+                const path = `${Date.now()}_diary.jpg`;
+                await client.storage.from('photos').upload(path, f);
+                const { data: url } = client.storage.from('photos').getPublicUrl(path);
+                await client.from('journal_entries').insert([{ image_url: url.publicUrl, amount: a || 0, description: d }]);
                 location.reload();
-            } catch (err) {
-                alert('发布失败：' + err.message);
-                btn.innerText = "确认发布";
-                btn.disabled = false;
-            }
+            } catch (err) { alert('失败：' + err.message); b.disabled = false; }
         }
+        load();
     </script>
 </body>
 </html>
