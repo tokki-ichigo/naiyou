@@ -1,4 +1,4 @@
-// ocr.js - 商品明细+金额增强识别版
+// ocr.js - 商品明细提取优化版
 async function performOCR(base64Image) {
     const API_KEY = 'AIzaSyAOEcowPZGMeeq-ttQ2Iad5aWDoUqicEmk'; 
     const url = `https://vision.googleapis.com/v1/images:annotate?key=${API_KEY}`;
@@ -24,40 +24,50 @@ async function performOCR(base64Image) {
         const fullText = data.responses[0].fullTextAnnotation.text;
         const lines = fullText.split('\n');
 
-        // --- 商品名与金额识别逻辑 ---
-        let items = [];
-        let totalAmount = null;
-        const jpTotalKeywords = ['合計', '合計金額', 'お支払い', '税込'];
-        const amountRegex = /([\d,]+)円?$/; // 匹配行尾的数字（可能带“円”）
+        let detectedAmount = null;
+        let foundItems = [];
+
+        // 1. 核心关键词定义
+        const totalKeywords = ['合計', '合計金額', 'お支払い', '税込'];
+        const ignoreKeywords = ['電話', '番号', '住所', 'レジ', '担当', '店', 'NO', '2026', '年', '月', '日'];
 
         lines.forEach(line => {
-            // 1. 寻找总额 (排除掉包含年份 2026 的行)
-            if (!line.includes('202') && !line.includes('年')) {
-                jpTotalKeywords.forEach(kw => {
-                    if (line.includes(kw)) {
-                        const match = line.match(/([\d,]+)/);
-                        if (match) totalAmount = parseFloat(match[0].replace(/,/g, ''));
-                    }
-                });
+            const cleanLine = line.trim();
+            if (!cleanLine) return;
+
+            // 2. 寻找总金额 (带有合计关键字的行)
+            if (totalKeywords.some(kw => cleanLine.includes(kw))) {
+                const amountMatch = cleanLine.match(/([\d,]+)/);
+                if (amountMatch) {
+                    detectedAmount = parseFloat(amountMatch[0].replace(/g, ''));
+                }
             }
 
-            // 2. 识别商品明细 (通常包含数字且不含“合计”等字样)
-            const amountMatch = line.match(/[\d,]+$/);
-            if (amountMatch && !jpTotalKeywords.some(kw => line.includes(kw)) && !line.includes('年') && line.length > 5) {
-                // 剔除掉只有数字的干扰行
-                items.push(line.trim());
+            // 3. 寻找潜在的商品行 (长度适中，且不包含干扰词)
+            // FamilyMart 的商品通常长这样： "健康ミネラルむぎ茶 170"
+            if (cleanLine.length > 4 && 
+                !ignoreKeywords.some(kw => cleanLine.includes(kw)) && 
+                !totalKeywords.some(kw => cleanLine.includes(kw))) {
+                
+                // 如果行末尾有数字，这通常就是一件商品
+                if (/\d+$/.test(cleanLine)) {
+                    foundItems.push(cleanLine);
+                }
             }
         });
 
-        // 3. 自动填写描述框 (ID: img-desc)
+        // 4. 自动填充心情描述框 (ID: img-desc)
         const descInput = document.getElementById('img-desc');
         if (descInput) {
-            // 将识别到的前几项商品组合在一起
-            const itemListStr = items.slice(0, 3).join(' | '); 
-            descInput.value = itemListStr ? `🛒 ${itemListStr}` : "记录生活点滴... 🐾";
+            // 只取识别到的第一件最清晰的商品，加上可爱的图标
+            if (foundItems.length > 0) {
+                descInput.value = "🛒 " + foundItems[0];
+            } else {
+                descInput.value = "记录生活点滴... 🐾";
+            }
         }
 
-        return totalAmount;
+        return detectedAmount;
     } catch (error) {
         console.error("OCR 识别出错:", error);
         return null;
