@@ -8,6 +8,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <link rel="apple-touch-icon" href="icon.jpg">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="ocr.js"></script>
     <style>
         :root { --p-border: 2px solid #000; --bg: #f4f1ea; }
         body { background: var(--bg); background-image: radial-gradient(#d1c7b7 1px, transparent 1px); background-size: 20px 20px; font-family: "PingFang SC", sans-serif; margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
@@ -45,7 +46,6 @@
         .close-btn { position: absolute; top: -12px; right: -12px; width: 30px; height: 30px; background: #ff4757; color: white; border-radius: 50%; border: var(--p-border); display: flex; align-items: center; justify-content: center; font-size: 18px; cursor: pointer; box-shadow: 2px 2px 0 #000; }
         .delete-record-btn { background: #ff4757; color: #fff; border: var(--p-border); padding: 8px 15px; margin-top: 15px; cursor: pointer; font-weight: bold; }
 
-        /* OCR 识别动画 */
         .ocr-loading {
             border: 4px solid #f3f3f3;
             border-top: 4px solid #3498db;
@@ -98,7 +98,6 @@
         </div>
     </div>
 
-
     <div class="floating-add" onclick="document.getElementById('upload-panel').style.display='block'">+</div>
 
     <script>
@@ -106,7 +105,7 @@
         const SB_KEY = 'sb_publishable_rAGZrZ7_xj5BukT4OJwrXA_f4bogSrm';
         const supabaseClient = supabase.createClient(SB_URL, SB_KEY);
 
-        let currentModalEntryId = null; // 用于存储当前弹窗显示记录的ID
+        let currentModalEntryId = null;
 
         async function fetchEntries() {
             const container = document.getElementById('photo-grid');
@@ -125,7 +124,7 @@
 
             container.innerHTML = '';
             let monthlyTotal = 0;
-            const currentMonth = new Date().toISOString().substring(0, 7); // YYYY-MM 格式
+            const currentMonth = new Date().toISOString().substring(0, 7);
 
             if (data && data.length > 0) {
                 data.forEach(item => {
@@ -133,7 +132,6 @@
                     const formattedDate = `${entryDate.getMonth() + 1}月${entryDate.getDate()}日`;
                     const formattedAmount = item.amount ? `¥${parseFloat(item.amount).toFixed(2)}` : '未记账';
 
-                    // 只计算本月的总额
                     if (item.created_at && item.created_at.startsWith(currentMonth)) {
                         monthlyTotal += parseFloat(item.amount || 0);
                     }
@@ -153,7 +151,6 @@
             }
         }
 
-        // 处理文件上传
         async function handleUpload() {
             const file = document.getElementById('file-input').files[0];
             const price = document.getElementById('item-price').value;
@@ -183,8 +180,8 @@
                 document.getElementById('upload-panel').style.display = 'none';
                 document.getElementById('item-price').value = '';
                 document.getElementById('img-desc').value = '';
-                document.getElementById('file-input').value = ''; // 清空文件选择
-                fetchEntries(); // 刷新数据
+                document.getElementById('file-input').value = ''; 
+                fetchEntries();
             } catch (err) {
                 alert('上传失败：' + err.message);
             } finally {
@@ -193,14 +190,10 @@
             }
         }
 
-        // 打开大图弹窗
         async function openModal(entryId) {
             currentModalEntryId = entryId;
             const { data, error } = await supabaseClient.from('journal_entries').select('*').eq('id', entryId).single();
-            if (error) {
-                console.error("获取记录详情失败:", error);
-                return;
-            }
+            if (error) return;
 
             const entryDate = new Date(data.created_at);
             document.getElementById('modal-image').src = data.image_url;
@@ -210,28 +203,23 @@
             document.getElementById('modal-overlay').style.display = 'flex';
         }
 
-        // 关闭大图弹窗
         function closeModal() {
             document.getElementById('modal-overlay').style.display = 'none';
             currentModalEntryId = null;
         }
 
-        // 从弹窗中删除记录
         async function deleteEntryFromModal() {
-            if (!currentModalEntryId || !confirm('确定要永久删除这条记录吗？')) {
-                return;
-            }
+            if (!currentModalEntryId || !confirm('确定要永久删除这条记录吗？')) return;
             try {
                 const { error } = await supabaseClient.from('journal_entries').delete().eq('id', currentModalEntryId);
                 if (error) throw error;
                 closeModal();
-                fetchEntries(); // 刷新列表
+                fetchEntries();
             } catch (err) {
                 alert('删除失败：' + err.message);
             }
         }
 
-        // OCR 识别并填充金额 (需要 ocr.js)
         async function previewImageAndOCR() {
             const fileInput = document.getElementById('file-input');
             const priceInput = document.getElementById('item-price');
@@ -248,10 +236,9 @@
             };
 
             reader.onload = async (e) => {
-                const base64Image = e.target.result.split(',')[1]; // 获取Base64编码，去除前缀
+                const base64Image = e.target.result.split(',')[1];
                 try {
-                    // 假设 OCR 函数在 ocr.js 中且返回识别到的金额
-                    // 注意：这里需要你提供的 ocr.js 文件！
+                    // 调用 ocr.js 中的 performOCR 函数
                     const recognizedAmount = await performOCR(base64Image); 
                     if (recognizedAmount) {
                         priceInput.value = parseFloat(recognizedAmount).toFixed(2);
@@ -269,8 +256,7 @@
             reader.readAsDataURL(file);
         }
         
-        fetchEntries(); // 首次加载数据
+        fetchEntries();
     </script>
-    <script src="ocr.js"></script> 
 </body>
 </html>
